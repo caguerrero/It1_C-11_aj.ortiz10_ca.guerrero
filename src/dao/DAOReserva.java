@@ -108,9 +108,9 @@ public class DAOReserva {
 	 */
 	public void addReserva(Reserva reserva) throws SQLException, Exception {
 
-		String sql = String.format("INSERT INTO %1$s.RESERVA (FECHARESERVA, FINESTADIA, IDRESERVA, INICIOESTADIA, PRECIO, IDCLIENTE, IDOFERTA) VALUES (%2$s, '%3$s', '%4$s', '%5$s', '%6$s','%7$s','%8$s')", 
+		String sql = String.format("INSERT INTO %1$s.RESERVA (FECHARESERVA, FINESTADIA, IDRESERVA, INICIOESTADIA, PRECIO, IDCLIENTE, IDOFERTA) VALUES (TO_DATE('%2$s', 'YYYY-MM-DD'), TO_DATE('%3$s', 'YYYY-MM-DD'), %4$s, TO_DATE('%5$s', 'YYYY-MM-DD'), %6$s,%7$s,%8$s)", 
 				USUARIO,
-				reserva.getFechaReserva(), 
+				reserva.getFechaReserva(),
 				reserva.getFinEstadia(),
 				reserva.getIdReserva(),
 				reserva.getInicioEstadia(),
@@ -137,7 +137,7 @@ public class DAOReserva {
 		StringBuilder sql = new StringBuilder();
 		sql.append (String.format ("UPDATE %1s.RESERVA ", USUARIO));
 		sql.append (String.format (
-				"SET FECHARESERVA = '%2$s', FINESTADIA = '%3$s', IDCLIENTE = '%4$s', IDOFERTA = '%5$s', INICIOESTADIA = '%6$s', PRECIO = '%7$s' ",
+				"SET FECHARESERVA = TO_DATE('%2$s', 'YYYY-MM-DD'), FINESTADIA = TO_DATE('%3$s', 'YYYY-MM-DD'), IDCLIENTE = %4$s, IDOFERTA = '%5$s' , INICIOESTADIA = TO_DATE('%6$s', 'YYYY-MM-DD'), PRECIO = '%7$s'",
 				reserva.getFechaReserva(), reserva.getFinEstadia(), reserva.getIdCliente(),
 				reserva.getIdOferta(), reserva.getInicioEstadia(), reserva.getPrecio()));
 		sql.append ("WHERE IDRESERVA = " + reserva.getIdReserva());
