@@ -144,7 +144,7 @@ public class DAOReservasDeAlojamiento {
 		 */
 		public void deleteReservasDeAlojamiento(ReservasDeAlojamiento ReservasDeAlojamiento) throws SQLException, Exception {
 
-			String sql = String.format("DELETE FROM %1$s.RESERVASDEALOJAMIENTO WHERE IDReservas = %2$d AND IDALOJAMIENTO = %3$d", USUARIO, ReservasDeAlojamiento.getIdReserva	(), ReservasDeAlojamiento.getIdAlojamiento());
+			String sql = String.format("DELETE FROM %1$s.RESERVASDEALOJAMIENTO WHERE IDRESERVA = %2$d AND IDALOJAMIENTO = %3$d", USUARIO, ReservasDeAlojamiento.getIdReserva	(), ReservasDeAlojamiento.getIdAlojamiento());
 
 			System.out.println(sql);
 
