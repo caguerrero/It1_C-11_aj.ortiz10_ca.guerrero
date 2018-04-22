@@ -165,13 +165,12 @@ public class DAOOferta {
 	
 	public ArrayList<Popular> get20MasPopulares() throws SQLException, Exception {
 		ArrayList<Popular> populares = new ArrayList<Popular>();
-		String sql = String.format("SELECT * FROM( SELECT IDOFERTA, SUM(CantReservas) as CantReservas" + 
-				" FROM (SELECT IDOFERTA, CantReservas" + 
-				" FROM %1$s.ALOJAMIENTOSDEOFERTA " + 
-				" NATURAL JOIN (SELECT IDALOJAMIENTO, COUNT(*) AS CantReservas" + 
-				" FROM %1$s.RESERVA GROUP BY IDALOJAMIENTO))" + 
-				" GROUP BY IDOFERTA ORDER BY CantReservas DESC) WHERE ROWNUM <= 20", USUARIO);
-
+		String sql = String.format("SELECT * FROM(SELECT IDOFERTA, SUM(CANTRESERVAS) AS CANTRESERVAS " + 
+				                  "FROM(SELECT IDOFERTA, CANTRESERVAS FROM %1$s.ALOJAMIENTOSDEOFERTA NATURAL JOIN " + 
+				                  "(SELECT IDALOJAMIENTO, COUNT(*) AS CANTRESERVAS " + 
+				                  "FROM %1$s.RESERVASDEALOJAMIENTO GROUP BY IDALOJAMIENTO)) " + 
+				                  "GROUP BY IDOFERTA ORDER BY CANTRESERVAS DESC) WHERE ROWNUM <= 20", USUARIO);
+		
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		ResultSet rs = prepStmt.executeQuery();
