@@ -17,6 +17,7 @@ import dao.DAOAlojamiento;
 import dao.DAOAlojamientosDeOferta;
 import dao.DAOOperador;
 import dao.DAOReserva;
+import dao.DAOReservasDeAlojamiento;
 import dao.DAOServicio;
 import dao.DAOServicioDeAlojamiento;
 import vos.Apartamento;
@@ -29,6 +30,7 @@ import vos.Operador;
 import vos.Pago;
 import vos.Popular;
 import vos.Reserva;
+import vos.ReservasDeAlojamiento;
 import vos.Servicio;
 import vos.ServicioDeAlojamiento;
 
@@ -353,7 +355,7 @@ public class AlohAndesTransactionManager {
 			}
 		}
 	}
-	
+
 	/**
 	 * Metodo que modela la transaccion que retorna todos los clientes de la base de datos. <br/>
 	 * @return List<Cliente> - Lista de clientes que contiene el resultado de la consulta.
@@ -565,7 +567,7 @@ public class AlohAndesTransactionManager {
 			}
 		}
 	}
-	
+
 	/**
 	 * Metodo que modela la transaccion que retorna todas las habitaciones de la base de datos. <br/>
 	 * @return List<Habitacion> - Lista de habitaciones que contiene el resultado de la consulta.
@@ -650,7 +652,7 @@ public class AlohAndesTransactionManager {
 		}
 		return habitacion;
 	}
-	
+
 	/**
 	 * Metodo que modela la transaccion que agrega un habitacion a la base de datos. <br/>
 	 * <b> post: </b> se ha agregado el habitacion que entra como parametro <br/>
@@ -862,7 +864,7 @@ public class AlohAndesTransactionManager {
 		}
 		return oferta;
 	}
-	
+
 	/**
 	 * Metodo que modela la transaccion que agrega una oferta de alojamiento a la base de datos. <br/>
 	 * <b> post: </b> se ha agregado la oferta de alojamiento que entra como parametro <br/>
@@ -992,7 +994,7 @@ public class AlohAndesTransactionManager {
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// TRANSACCIONES DE LA TABLA OPERADORES
 	//----------------------------------------------------------------------------------------------------------------------------------	
-	
+
 	/**
 	 * Metodo que modela la transaccion que retorna todos los operadores de la base de datos. <br/>
 	 * @return List<Operador> - Lista de operadores que contiene el resultado de la consulta.
@@ -1119,7 +1121,7 @@ public class AlohAndesTransactionManager {
 		}
 	}
 
-	
+
 
 	/**
 	 * Metodo que modela la transaccion que actualiza en la base de datos al operador que entra por parametro.<br/>
@@ -1207,1131 +1209,1350 @@ public class AlohAndesTransactionManager {
 			}
 		}	
 	}
-	
-		//----------------------------------------------------------------------------------------------------------------------------------
-		// TRANSACCIONES DE LA TABLA RESERVAS
-		//----------------------------------------------------------------------------------------------------------------------------------	
-		
-		/**
-		 * Metodo que modela la transaccion que retorna todos los reservas de la base de datos. <br/>
-		 * @return List<Reserva> - Lista de reservas que contiene el resultado de la consulta.
-		 * @throws Exception -  Cualquier error que se genere durante la transaccion
-		 */
-		public List<Reserva> getAllReservas() throws Exception {
-			DAOReserva daoReserva = new DAOReserva();
-			List<Reserva> reservas;
-			try 
-			{
-				this.conn = darConexion();
-				daoReserva.setConn(conn);
-				reservas = daoReserva.getReservas();
-			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoReserva.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}
-			return reservas;
-		}
 
-		/**
-		 * Metodo que modela la transaccion que busca el reserva en la base de datos que tiene el ID dado por parametro. <br/>
-		 * @param name -id del reserva a buscar. id != null
-		 * @return Reserva - Reserva que se obtiene como resultado de la consulta.
-		 * @throws Exception -  cualquier error que se genere durante la transaccion
-		 */
-		public Reserva getReservaById(Long id) throws Exception {
-			DAOReserva daoReserva = new DAOReserva();
-			Reserva reserva = null;
-			try 
-			{
-				this.conn = darConexion();
-				daoReserva.setConn(conn);
-				reserva = daoReserva.findReservaById(id);
-				if(reserva == null)
-				{
-					throw new Exception("El reserva con el id = " + id + " no se encuentra persistido en la base de datos.");				
-				}
-			} 
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoReserva.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}
-			return reserva;
-		}
+	//----------------------------------------------------------------------------------------------------------------------------------
+	// TRANSACCIONES DE LA TABLA RESERVAS
+	//----------------------------------------------------------------------------------------------------------------------------------	
 
-		/**
-		 * Metodo que modela la transaccion que agrega un reserva a la base de datos. <br/>
-		 * <b> post: </b> se ha agregado el reserva que entra como parametro <br/>
-		 * @param reserva - el reserva a agregar. reserva != null
-		 * @throws Exception - Cualquier error que se genere agregando el reserva
-		 */
-		public void addReserva(Reserva reserva) throws Exception 
+	/**
+	 * Metodo que modela la transaccion que retorna todos los reservas de la base de datos. <br/>
+	 * @return List<Reserva> - Lista de reservas que contiene el resultado de la consulta.
+	 * @throws Exception -  Cualquier error que se genere durante la transaccion
+	 */
+	public List<Reserva> getAllReservas() throws Exception {
+		DAOReserva daoReserva = new DAOReserva();
+		List<Reserva> reservas;
+		try 
 		{
-
-			DAOReserva daoReserva = new DAOReserva( );
-			try
-			{
-				this.conn = darConexion();
-				daoReserva.setConn(conn);
-				daoReserva.addReserva(reserva);
+			this.conn = darConexion();
+			daoReserva.setConn(conn);
+			reservas = daoReserva.getReservas();
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReserva.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoReserva.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
 			}
 		}
+		return reservas;
+	}
 
-		
-
-		/**
-		 * Metodo que modela la transaccion que actualiza en la base de datos al reserva que entra por parametro.<br/>
-		 * Solamente se actualiza si existe el reserva en la Base de Datos <br/>
-		 * <b> post: </b> se ha actualizado el reserva que entra como parametro <br/>
-		 * @param reserva - Reserva a actualizar. reserva != null
-		 * @throws Exception - Cualquier error que se genere actualizando al reserva.
-		 */
-		public void updateReserva(Reserva reserva) throws Exception 
+	/**
+	 * Metodo que modela la transaccion que busca el reserva en la base de datos que tiene el ID dado por parametro. <br/>
+	 * @param name -id del reserva a buscar. id != null
+	 * @return Reserva - Reserva que se obtiene como resultado de la consulta.
+	 * @throws Exception -  cualquier error que se genere durante la transaccion
+	 */
+	public Reserva getReservaById(Long id) throws Exception {
+		DAOReserva daoReserva = new DAOReserva();
+		Reserva reserva = null;
+		try 
 		{
-			DAOReserva daoReserva = new DAOReserva( );
-			try
+			this.conn = darConexion();
+			daoReserva.setConn(conn);
+			reserva = daoReserva.findReservaById(id);
+			if(reserva == null)
 			{
-				this.conn = darConexion();
-				daoReserva.setConn( conn );
-				if(daoReserva.findReservaById(reserva.getIdReserva()) !=null)
-				{daoReserva.updateReserva(reserva);}
-				else
-				{throw new Exception("La reserva con el ID " + reserva.getIdReserva() + " no se encuentra en la base de datos");}
+				throw new Exception("El reserva con el id = " + id + " no se encuentra persistido en la base de datos.");				
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReserva.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoReserva.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}	
+			}
 		}
-		/**
-		 * Metodo que modela la transaccion que elimina de la base de datos al reserva que entra por parametro. <br/>
-		 * Solamente se actualiza si existe el reserva en la Base de Datos <br/>
-		 * <b> post: </b> se ha eliminado el reserva que entra por parametro <br/>
-		 * @param Reserva - reserva a eliminar. reserva != null
-		 * @throws Exception - Cualquier error que se genere eliminando al reserva.
-		 */
-		public void deleteReserva(Reserva reserva) throws Exception 
+		return reserva;
+	}
+
+	/**
+	 * Metodo que modela la transaccion que agrega un reserva a la base de datos. <br/>
+	 * <b> post: </b> se ha agregado el reserva que entra como parametro <br/>
+	 * @param reserva - el reserva a agregar. reserva != null
+	 * @throws Exception - Cualquier error que se genere agregando el reserva
+	 */
+	public void addReserva(Reserva reserva) throws Exception 
+	{
+
+		DAOReserva daoReserva = new DAOReserva( );
+		try
 		{
-			DAOReserva daoReserva = new DAOReserva( );
-			try
-			{
-				this.conn = darConexion();
-				daoReserva.setConn( conn );
-				if(daoReserva.findReservaById(reserva.getIdReserva()) != null)
-				{daoReserva.deleteReserva(reserva);}
-				else
-				{throw new Exception("La reserva con ID " + reserva.getIdReserva() + " no se encuentra en la base de datos");}
+			this.conn = darConexion();
+			daoReserva.setConn(conn);
+			daoReserva.addReserva(reserva);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReserva.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoReserva.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}	
-		}
-
-		//----------------------------------------------------------------------------------------------------------------------------------
-		// TRANSACCIONES DE LA TABLA SERVICIOS
-		//----------------------------------------------------------------------------------------------------------------------------------	
-		
-		/**
-		 * Metodo que modela la transaccion que retorna todos los servicios de la base de datos. <br/>
-		 * @return List<Servicio> - Lista de servicios que contiene el resultado de la consulta.
-		 * @throws Exception -  Cualquier error que se genere durante la transaccion
-		 */
-		public List<Servicio> getAllServicios() throws Exception {
-			DAOServicio daoServicio = new DAOServicio();
-			List<Servicio> servicios;
-			try 
-			{
-				this.conn = darConexion();
-				daoServicio.setConn(conn);
-				servicios = daoServicio.getServicios();
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoServicio.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}
-			return servicios;
 		}
+	}
 
-		/**
-		 * Metodo que modela la transaccion que busca el servicio en la base de datos que tiene el ID dado por parametro. <br/>
-		 * @param name -id del servicio a buscar. id != null
-		 * @return Servicio - Servicio que se obtiene como resultado de la consulta.
-		 * @throws Exception -  cualquier error que se genere durante la transaccion
-		 */
-		public Servicio getServicioById(Long id) throws Exception {
-			DAOServicio daoServicio = new DAOServicio();
-			Servicio servicio = null;
-			try 
-			{
-				this.conn = darConexion();
-				daoServicio.setConn(conn);
-				servicio = daoServicio.findServicioById(id);
-				if(servicio == null)
-				{
-					throw new Exception("El servicio con el id = " + id + " no se encuentra persistido en la base de datos.");				
-				}
-			} 
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoServicio.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}
-			return servicio;
-		}
 
-		/**
-		 * Metodo que modela la transaccion que agrega un servicio a la base de datos. <br/>
-		 * <b> post: </b> se ha agregado el servicio que entra como parametro <br/>
-		 * @param servicio - el servicio a agregar. servicio != null
-		 * @throws Exception - Cualquier error que se genere agregando el servicio
-		 */
-		public void addServicio(Servicio servicio) throws Exception 
+
+	/**
+	 * Metodo que modela la transaccion que actualiza en la base de datos al reserva que entra por parametro.<br/>
+	 * Solamente se actualiza si existe el reserva en la Base de Datos <br/>
+	 * <b> post: </b> se ha actualizado el reserva que entra como parametro <br/>
+	 * @param reserva - Reserva a actualizar. reserva != null
+	 * @throws Exception - Cualquier error que se genere actualizando al reserva.
+	 */
+	public void updateReserva(Reserva reserva) throws Exception 
+	{
+		DAOReserva daoReserva = new DAOReserva( );
+		try
 		{
-
-			DAOServicio daoServicio = new DAOServicio( );
-			try
-			{
-				this.conn = darConexion();
-				daoServicio.setConn(conn);
-				daoServicio.addServicio(servicio);
+			this.conn = darConexion();
+			daoReserva.setConn( conn );
+			if(daoReserva.findReservaById(reserva.getIdReserva()) !=null)
+			{daoReserva.updateReserva(reserva);}
+			else
+			{throw new Exception("La reserva con el ID " + reserva.getIdReserva() + " no se encuentra en la base de datos");}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReserva.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoServicio.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
 			}
-		}
-
-		
-
-		/**
-		 * Metodo que modela la transaccion que actualiza en la base de datos al servicio que entra por parametro.<br/>
-		 * Solamente se actualiza si existe el servicio en la Base de Datos <br/>
-		 * <b> post: </b> se ha actualizado el servicio que entra como parametro <br/>
-		 * @param servicio - Servicio a actualizar. servicio != null
-		 * @throws Exception - Cualquier error que se genere actualizando al servicio.
-		 */
-		public void updateServicio(Servicio servicio) throws Exception 
+		}	
+	}
+	/**
+	 * Metodo que modela la transaccion que elimina de la base de datos al reserva que entra por parametro. <br/>
+	 * Solamente se actualiza si existe el reserva en la Base de Datos <br/>
+	 * <b> post: </b> se ha eliminado el reserva que entra por parametro <br/>
+	 * @param Reserva - reserva a eliminar. reserva != null
+	 * @throws Exception - Cualquier error que se genere eliminando al reserva.
+	 */
+	public void deleteReserva(Reserva reserva) throws Exception 
+	{
+		DAOReserva daoReserva = new DAOReserva( );
+		try
 		{
-			DAOServicio daoServicio = new DAOServicio( );
-			try
-			{
-				this.conn = darConexion();
-				daoServicio.setConn( conn );
-				if(daoServicio.findServicioById(servicio.getIdServicio()) !=null)
-				{daoServicio.updateServicio(servicio);}
-				else
-				{throw new Exception("La servicio con el ID " + servicio.getIdServicio() + " no se encuentra en la base de datos");}
+			this.conn = darConexion();
+			daoReserva.setConn( conn );
+			if(daoReserva.findReservaById(reserva.getIdReserva()) != null)
+			{daoReserva.deleteReserva(reserva);}
+			else
+			{throw new Exception("La reserva con ID " + reserva.getIdReserva() + " no se encuentra en la base de datos");}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReserva.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoServicio.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}	
-		}
-		/**
-		 * Metodo que modela la transaccion que elimina de la base de datos al servicio que entra por parametro. <br/>
-		 * Solamente se actualiza si existe el servicio en la Base de Datos <br/>
-		 * <b> post: </b> se ha eliminado el servicio que entra por parametro <br/>
-		 * @param Servicio - servicio a eliminar. servicio != null
-		 * @throws Exception - Cualquier error que se genere eliminando al servicio.
-		 */
-		public void deleteServicio(Servicio servicio) throws Exception 
+			}
+		}	
+	}
+
+	//----------------------------------------------------------------------------------------------------------------------------------
+	// TRANSACCIONES DE LA TABLA SERVICIOS
+	//----------------------------------------------------------------------------------------------------------------------------------	
+
+	/**
+	 * Metodo que modela la transaccion que retorna todos los servicios de la base de datos. <br/>
+	 * @return List<Servicio> - Lista de servicios que contiene el resultado de la consulta.
+	 * @throws Exception -  Cualquier error que se genere durante la transaccion
+	 */
+	public List<Servicio> getAllServicios() throws Exception {
+		DAOServicio daoServicio = new DAOServicio();
+		List<Servicio> servicios;
+		try 
 		{
-			DAOServicio daoServicio = new DAOServicio( );
-			try
-			{
-				this.conn = darConexion();
-				daoServicio.setConn( conn );
-				if(daoServicio.findServicioById(servicio.getIdServicio()) != null)
-				{daoServicio.deleteServicio(servicio);}
-				else
-				{throw new Exception("La servicio con ID " + servicio.getIdServicio() + " no se encuentra en la base de datos");}
+			this.conn = darConexion();
+			daoServicio.setConn(conn);
+			servicios = daoServicio.getServicios();
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoServicio.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoServicio.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}	
-		}
-		
-		//----------------------------------------------------------------------------------------------------------------------------------
-		// TRANSACCIONES DE LA TABLA SERVICIOSDEALOJAMIENTO
-		//----------------------------------------------------------------------------------------------------------------------------------	
-		
-		/**
-		 * Metodo que modela la transaccion que retorna todos los serviciosDeAlojamiento de la base de datos. <br/>
-		 * @return List<ServicioDeAlojamiento> - Lista de serviciosDeAlojamiento que contiene el resultado de la consulta.
-		 * @throws Exception -  Cualquier error que se genere durante la transaccion
-		 */
-		public List<ServicioDeAlojamiento> getAllServiciosDeAlojamiento() throws Exception {
-			DAOServicioDeAlojamiento daoServicioDeAlojamiento = new DAOServicioDeAlojamiento();
-			List<ServicioDeAlojamiento> serviciosDeAlojamiento;
-			try 
-			{
-				this.conn = darConexion();
-				daoServicioDeAlojamiento.setConn(conn);
-				serviciosDeAlojamiento = daoServicioDeAlojamiento.getAllServiciosDeAlojamiento();
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoServicioDeAlojamiento.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}
-			return serviciosDeAlojamiento;
 		}
+		return servicios;
+	}
 
-		/**
-		 * Metodo que modela la transaccion que busca el servicioDeAlojamiento en la base de datos que tiene el ID dado por parametro. <br/>
-		 * @param name -id del servicioDeAlojamiento a buscar. id != null
-		 * @return ServicioDeAlojamiento - ServicioDeAlojamiento que se obtiene como resultado de la consulta.
-		 * @throws Exception -  cualquier error que se genere durante la transaccion
-		 */
-		public ServicioDeAlojamiento getServicioDeAlojamientoByIds(Long id1,Long id2) throws Exception {
-			DAOServicioDeAlojamiento daoServicioDeAlojamiento = new DAOServicioDeAlojamiento();
-			ServicioDeAlojamiento servicioDeAlojamiento = null;
-			try 
-			{
-				this.conn = darConexion();
-				daoServicioDeAlojamiento.setConn(conn);
-				servicioDeAlojamiento = daoServicioDeAlojamiento.findServicioDeAlojamientoByIds(id1, id2);
-				if(servicioDeAlojamiento == null)
-				{
-					throw new Exception("El servicioDeAlojamiento con el idServicio = " + id1+ "y con el idOfertaAlojamiento = "+ id2 + " no se encuentra persistido en la base de datos.");				
-				}
-			} 
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoServicioDeAlojamiento.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}
-			return servicioDeAlojamiento;
-		}
-
-		/**
-		 * Metodo que modela la transaccion que agrega un servicioDeAlojamiento a la base de datos. <br/>
-		 * <b> post: </b> se ha agregado el servicioDeAlojamiento que entra como parametro <br/>
-		 * @param servicioDeAlojamiento - el servicioDeAlojamiento a agregar. servicioDeAlojamiento != null
-		 * @throws Exception - Cualquier error que se genere agregando el servicioDeAlojamiento
-		 */
-		public void addServicioDeAlojamiento(ServicioDeAlojamiento servicioDeAlojamiento) throws Exception 
+	/**
+	 * Metodo que modela la transaccion que busca el servicio en la base de datos que tiene el ID dado por parametro. <br/>
+	 * @param name -id del servicio a buscar. id != null
+	 * @return Servicio - Servicio que se obtiene como resultado de la consulta.
+	 * @throws Exception -  cualquier error que se genere durante la transaccion
+	 */
+	public Servicio getServicioById(Long id) throws Exception {
+		DAOServicio daoServicio = new DAOServicio();
+		Servicio servicio = null;
+		try 
 		{
-
-			DAOServicioDeAlojamiento daoServicioDeAlojamiento = new DAOServicioDeAlojamiento( );
-			try
+			this.conn = darConexion();
+			daoServicio.setConn(conn);
+			servicio = daoServicio.findServicioById(id);
+			if(servicio == null)
 			{
-				this.conn = darConexion();
-				daoServicioDeAlojamiento.setConn(conn);
-				daoServicioDeAlojamiento.addServicioDeAlojamiento(servicioDeAlojamiento);
+				throw new Exception("El servicio con el id = " + id + " no se encuentra persistido en la base de datos.");				
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoServicio.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoServicioDeAlojamiento.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
 			}
 		}
+		return servicio;
+	}
 
-		
+	/**
+	 * Metodo que modela la transaccion que agrega un servicio a la base de datos. <br/>
+	 * <b> post: </b> se ha agregado el servicio que entra como parametro <br/>
+	 * @param servicio - el servicio a agregar. servicio != null
+	 * @throws Exception - Cualquier error que se genere agregando el servicio
+	 */
+	public void addServicio(Servicio servicio) throws Exception 
+	{
 
-		/**
-		 * Metodo que modela la transaccion que actualiza en la base de datos al servicioDeAlojamiento que entra por parametro.<br/>
-		 * Solamente se actualiza si existe el servicioDeAlojamiento en la Base de Datos <br/>
-		 * <b> post: </b> se ha actualizado el servicioDeAlojamiento que entra como parametro <br/>
-		 * @param servicioDeAlojamiento - ServicioDeAlojamiento a actualizar. servicioDeAlojamiento != null
-		 * @throws Exception - Cualquier error que se genere actualizando al servicioDeAlojamiento.
-		 */
-		public void updateServicioDeAlojamiento(ServicioDeAlojamiento servicioDeAlojamiento) throws Exception 
+		DAOServicio daoServicio = new DAOServicio( );
+		try
 		{
-			DAOServicioDeAlojamiento daoServicioDeAlojamiento = new DAOServicioDeAlojamiento( );
-			try
-			{
-				this.conn = darConexion();
-				daoServicioDeAlojamiento.setConn( conn );
-				if(daoServicioDeAlojamiento.findServicioDeAlojamientoByIds(servicioDeAlojamiento.getIdServicio(),servicioDeAlojamiento.getIdAlojamiento()) !=null)
-				{daoServicioDeAlojamiento.updateServicioDeAlojamiento(servicioDeAlojamiento);}
-				else
-				{throw new Exception("El servicioDeAlojamiento con el IDSERVICIO " + servicioDeAlojamiento.getIdServicio() + " y el IDOFERTAALOJAMIENTO " + servicioDeAlojamiento.getIdAlojamiento() +  " no se encuentra en la base de datos");}
+			this.conn = darConexion();
+			daoServicio.setConn(conn);
+			daoServicio.addServicio(servicio);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoServicio.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoServicioDeAlojamiento.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}	
+			}
 		}
-		/**
-		 * Metodo que modela la transaccion que elimina de la base de datos al servicioDeAlojamiento que entra por parametro. <br/>
-		 * Solamente se actualiza si existe el servicioDeAlojamiento en la Base de Datos <br/>
-		 * <b> post: </b> se ha eliminado el servicioDeAlojamiento que entra por parametro <br/>
-		 * @param ServicioDeAlojamiento - servicioDeAlojamiento a eliminar. servicioDeAlojamiento != null
-		 * @throws Exception - Cualquier error que se genere eliminando al servicioDeAlojamiento.
-		 */
-		public void deleteServicioDeAlojamiento(ServicioDeAlojamiento servicioDeAlojamiento) throws Exception 
+	}
+
+
+
+	/**
+	 * Metodo que modela la transaccion que actualiza en la base de datos al servicio que entra por parametro.<br/>
+	 * Solamente se actualiza si existe el servicio en la Base de Datos <br/>
+	 * <b> post: </b> se ha actualizado el servicio que entra como parametro <br/>
+	 * @param servicio - Servicio a actualizar. servicio != null
+	 * @throws Exception - Cualquier error que se genere actualizando al servicio.
+	 */
+	public void updateServicio(Servicio servicio) throws Exception 
+	{
+		DAOServicio daoServicio = new DAOServicio( );
+		try
 		{
-			DAOServicioDeAlojamiento daoServicioDeAlojamiento = new DAOServicioDeAlojamiento( );
-			try
-			{
-				this.conn = darConexion();
-				daoServicioDeAlojamiento.setConn( conn );
-				if(daoServicioDeAlojamiento.findServicioDeAlojamientoByIds(servicioDeAlojamiento.getIdServicio(),servicioDeAlojamiento.getIdAlojamiento()) != null )
-				{daoServicioDeAlojamiento.deleteServicioDeAlojamiento(servicioDeAlojamiento);}
-				else
-				{throw new Exception("La servicioDeAlojamiento con IDSERVICIO " + servicioDeAlojamiento.getIdServicio() + " y con IDOFERTAALOJAMIENTO = " + servicioDeAlojamiento.getIdAlojamiento() + " no se encuentra en la base de datos");}
+			this.conn = darConexion();
+			daoServicio.setConn( conn );
+			if(daoServicio.findServicioById(servicio.getIdServicio()) !=null)
+			{daoServicio.updateServicio(servicio);}
+			else
+			{throw new Exception("La servicio con el ID " + servicio.getIdServicio() + " no se encuentra en la base de datos");}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoServicio.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoServicioDeAlojamiento.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}	
-		}
-		
-		//----------------------------------------------------------------------------------------------------------------------------------
-		// TRANSACCIONES DE LA TABLA AlojamientosDeOferta
-		//----------------------------------------------------------------------------------------------------------------------------------	
-		
-		/**
-		 * Metodo que modela la transaccion que retorna todos los alojamientosDeOferta de la base de datos. <br/>
-		 * @return List<AlojamientoDeOferta> - Lista de alojamientosDeOferta que contiene el resultado de la consulta.
-		 * @throws Exception -  Cualquier error que se genere durante la transaccion
-		 */
-		public List<AlojamientosDeOferta> getAllAlojamientosDeOferta() throws Exception {
-			DAOAlojamientosDeOferta daoAlojamientoDeOferta = new DAOAlojamientosDeOferta();
-			List<AlojamientosDeOferta> alojamientosDeOferta;
-			try 
-			{
-				this.conn = darConexion();
-				daoAlojamientoDeOferta.setConn(conn);
-				alojamientosDeOferta = daoAlojamientoDeOferta.getAlojamientosDeOfertas();
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoAlojamientoDeOferta.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}
-			return alojamientosDeOferta;
-		}
-
-		/**
-		 * Metodo que modela la transaccion que busca el alojamientoDeOferta en la base de datos que tiene el ID dado por parametro. <br/>
-		 * @param name -id del alojamientoDeOferta a buscar. id != null
-		 * @return AlojamientoDeOferta - AlojamientoDeOferta que se obtiene como resultado de la consulta.
-		 * @throws Exception -  cualquier error que se genere durante la transaccion
-		 */
-		public AlojamientosDeOferta getAlojamientoDeOfertaByIds(Long id1,Long id2) throws Exception {
-			DAOAlojamientosDeOferta daoAlojamientoDeOferta = new DAOAlojamientosDeOferta();
-			AlojamientosDeOferta alojamientoDeOferta = null;
-			try 
-			{
-				this.conn = darConexion();
-				daoAlojamientoDeOferta.setConn(conn);
-				alojamientoDeOferta = daoAlojamientoDeOferta.findAlojamientosDeOfertaById(id1, id2);
-				if(alojamientoDeOferta == null)
-				{
-					throw new Exception("El alojamientoDeOferta con el idServicio = " + id1+ "y con el idOfertaAlojamiento = "+ id2 + " no se encuentra persistido en la base de datos.");				
-				}
-			} 
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoAlojamientoDeOferta.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}
-			return alojamientoDeOferta;
-		}
-
-		/**
-		 * Metodo que modela la transaccion que agrega un alojamientoDeOferta a la base de datos. <br/>
-		 * <b> post: </b> se ha agregado el alojamientoDeOferta que entra como parametro <br/>
-		 * @param alojamientoDeOferta - el alojamientoDeOferta a agregar. alojamientoDeOferta != null
-		 * @throws Exception - Cualquier error que se genere agregando el alojamientoDeOferta
-		 */
-		public void addAlojamientoDeOferta(AlojamientosDeOferta alojamientoDeOferta) throws Exception 
+		}	
+	}
+	/**
+	 * Metodo que modela la transaccion que elimina de la base de datos al servicio que entra por parametro. <br/>
+	 * Solamente se actualiza si existe el servicio en la Base de Datos <br/>
+	 * <b> post: </b> se ha eliminado el servicio que entra por parametro <br/>
+	 * @param Servicio - servicio a eliminar. servicio != null
+	 * @throws Exception - Cualquier error que se genere eliminando al servicio.
+	 */
+	public void deleteServicio(Servicio servicio) throws Exception 
+	{
+		DAOServicio daoServicio = new DAOServicio( );
+		try
 		{
-
-			DAOAlojamientosDeOferta daoAlojamientoDeOferta = new DAOAlojamientosDeOferta( );
-			try
-			{
-				this.conn = darConexion();
-				daoAlojamientoDeOferta.setConn(conn);
-				daoAlojamientoDeOferta.addAlojamientosDeOferta(alojamientoDeOferta);
+			this.conn = darConexion();
+			daoServicio.setConn( conn );
+			if(daoServicio.findServicioById(servicio.getIdServicio()) != null)
+			{daoServicio.deleteServicio(servicio);}
+			else
+			{throw new Exception("La servicio con ID " + servicio.getIdServicio() + " no se encuentra en la base de datos");}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoServicio.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoAlojamientoDeOferta.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
 			}
-		}
+		}	
+	}
 
-		/**
-		 * Metodo que modela la transaccion que elimina de la base de datos al alojamientoDeOferta que entra por parametro. <br/>
-		 * Solamente se actualiza si existe el alojamientoDeOferta en la Base de Datos <br/>
-		 * <b> post: </b> se ha eliminado el alojamientoDeOferta que entra por parametro <br/>
-		 * @param AlojamientoDeOferta - alojamientoDeOferta a eliminar. alojamientoDeOferta != null
-		 * @throws Exception - Cualquier error que se genere eliminando al alojamientoDeOferta.
-		 */
-		public void deleteAlojamientoDeOferta(AlojamientosDeOferta alojamientoDeOferta) throws Exception 
+	//----------------------------------------------------------------------------------------------------------------------------------
+	// TRANSACCIONES DE LA TABLA SERVICIOSDEALOJAMIENTO
+	//----------------------------------------------------------------------------------------------------------------------------------	
+
+	/**
+	 * Metodo que modela la transaccion que retorna todos los serviciosDeAlojamiento de la base de datos. <br/>
+	 * @return List<ServicioDeAlojamiento> - Lista de serviciosDeAlojamiento que contiene el resultado de la consulta.
+	 * @throws Exception -  Cualquier error que se genere durante la transaccion
+	 */
+	public List<ServicioDeAlojamiento> getAllServiciosDeAlojamiento() throws Exception {
+		DAOServicioDeAlojamiento daoServicioDeAlojamiento = new DAOServicioDeAlojamiento();
+		List<ServicioDeAlojamiento> serviciosDeAlojamiento;
+		try 
 		{
-			DAOAlojamientosDeOferta daoAlojamientoDeOferta = new DAOAlojamientosDeOferta( );
-			try
-			{
-				this.conn = darConexion();
-				daoAlojamientoDeOferta.setConn( conn );
-				if(daoAlojamientoDeOferta.findAlojamientosDeOfertaById(alojamientoDeOferta.getIdOferta(),alojamientoDeOferta.getIdAlojamiento()) != null )
-				{daoAlojamientoDeOferta.deleteAlojamientosDeOferta(alojamientoDeOferta);}
-				else
-				{throw new Exception("La alojamientoDeOferta con IDSERVICIO " + alojamientoDeOferta.getIdOferta() + " y con IDOFERTAALOJAMIENTO = " + alojamientoDeOferta.getIdAlojamiento() + " no se encuentra en la base de datos");}
+			this.conn = darConexion();
+			daoServicioDeAlojamiento.setConn(conn);
+			serviciosDeAlojamiento = daoServicioDeAlojamiento.getAllServiciosDeAlojamiento();
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoServicioDeAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoAlojamientoDeOferta.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}	
-		}
-		//----------------------------------------------------------------------------------------------------------------------------------
-		// TRANSACCIONES DE LA TABLA OFERTAS
-		//----------------------------------------------------------------------------------------------------------------------------------	
-
-		/**
-		 * Metodo que modela la transaccion que retorna todos los ofertas de la base de datos. <br/>
-		 * @return List<Oferta> - Lista de ofertas que contiene el resultado de la consulta.
-		 * @throws Exception -  Cualquier error que se genere durante la transaccion
-		 */
-		public List<Oferta> getAllOfertas() throws Exception {
-			DAOOferta daoOferta = new DAOOferta();
-			List<Oferta> ofertas;
-			try 
-			{
-				this.conn = darConexion();
-				daoOferta.setConn(conn);
-				ofertas = daoOferta.getOfertas();
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoOferta.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}
-			return ofertas;
 		}
+		return serviciosDeAlojamiento;
+	}
 
-		/**
-		 * Metodo que modela la transaccion que busca el oferta en la base de datos que tiene el ID dado por parametro. <br/>
-		 * @param name -id del oferta a buscar. id != null
-		 * @return Oferta - Oferta que se obtiene como resultado de la consulta.
-		 * @throws Exception -  cualquier error que se genere durante la transaccion
-		 */
-		public Oferta getOfertaById(Long id) throws Exception {
-			DAOOferta daoOferta = new DAOOferta();
-			Oferta oferta = null;
-			try 
-			{
-				this.conn = darConexion();
-				daoOferta.setConn(conn);
-				oferta = daoOferta.findOfertaById(id);
-				if(oferta == null)
-				{
-					throw new Exception("El oferta con el id = " + id + " no se encuentra persistido en la base de datos.");				
-				}
-			} 
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoOferta.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}
-			return oferta;
-		}
-
-		/**
-		 * Metodo que modela la transaccion que agrega un oferta a la base de datos. <br/>
-		 * <b> post: </b> se ha agregado el oferta que entra como parametro <br/>
-		 * @param oferta - el oferta a agregar. oferta != null
-		 * @throws Exception - Cualquier error que se genere agregando el oferta
-		 */
-		public void addOferta(Oferta oferta) throws Exception 
+	/**
+	 * Metodo que modela la transaccion que busca el servicioDeAlojamiento en la base de datos que tiene el ID dado por parametro. <br/>
+	 * @param name -id del servicioDeAlojamiento a buscar. id != null
+	 * @return ServicioDeAlojamiento - ServicioDeAlojamiento que se obtiene como resultado de la consulta.
+	 * @throws Exception -  cualquier error que se genere durante la transaccion
+	 */
+	public ServicioDeAlojamiento getServicioDeAlojamientoByIds(Long id1,Long id2) throws Exception {
+		DAOServicioDeAlojamiento daoServicioDeAlojamiento = new DAOServicioDeAlojamiento();
+		ServicioDeAlojamiento servicioDeAlojamiento = null;
+		try 
 		{
-
-			DAOOferta daoOferta = new DAOOferta( );
-			try
+			this.conn = darConexion();
+			daoServicioDeAlojamiento.setConn(conn);
+			servicioDeAlojamiento = daoServicioDeAlojamiento.findServicioDeAlojamientoByIds(id1, id2);
+			if(servicioDeAlojamiento == null)
 			{
-				this.conn = darConexion();
-				daoOferta.setConn(conn);
-				daoOferta.addOferta(oferta);
+				throw new Exception("El servicioDeAlojamiento con el idServicio = " + id1+ "y con el idOfertaAlojamiento = "+ id2 + " no se encuentra persistido en la base de datos.");				
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoServicioDeAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoOferta.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
 			}
 		}
+		return servicioDeAlojamiento;
+	}
 
+	/**
+	 * Metodo que modela la transaccion que agrega un servicioDeAlojamiento a la base de datos. <br/>
+	 * <b> post: </b> se ha agregado el servicioDeAlojamiento que entra como parametro <br/>
+	 * @param servicioDeAlojamiento - el servicioDeAlojamiento a agregar. servicioDeAlojamiento != null
+	 * @throws Exception - Cualquier error que se genere agregando el servicioDeAlojamiento
+	 */
+	public void addServicioDeAlojamiento(ServicioDeAlojamiento servicioDeAlojamiento) throws Exception 
+	{
 
-
-		/**
-		 * Metodo que modela la transaccion que actualiza en la base de datos al oferta que entra por parametro.<br/>
-		 * Solamente se actualiza si existe el oferta en la Base de Datos <br/>
-		 * <b> post: </b> se ha actualizado el oferta que entra como parametro <br/>
-		 * @param oferta - Oferta a actualizar. oferta != null
-		 * @throws Exception - Cualquier error que se genere actualizando al oferta.
-		 */
-		public void updateOferta(Oferta oferta) throws Exception 
+		DAOServicioDeAlojamiento daoServicioDeAlojamiento = new DAOServicioDeAlojamiento( );
+		try
 		{
-			DAOOferta daoOferta = new DAOOferta( );
-			try
-			{
-				this.conn = darConexion();
-				daoOferta.setConn( conn );
-				if(daoOferta.findOfertaById(oferta.getIdOferta()) !=null)
-				{daoOferta.updateOferta(oferta);}
-				else
-				{throw new Exception("La oferta con el ID " + oferta.getIdOferta() + " no se encuentra en la base de datos");}
+			this.conn = darConexion();
+			daoServicioDeAlojamiento.setConn(conn);
+			daoServicioDeAlojamiento.addServicioDeAlojamiento(servicioDeAlojamiento);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoServicioDeAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
 			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoOferta.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}	
+			}
 		}
-		/**
-		 * Metodo que modela la transaccion que elimina de la base de datos al oferta que entra por parametro. <br/>
-		 * Solamente se actualiza si existe el oferta en la Base de Datos <br/>
-		 * <b> post: </b> se ha eliminado el oferta que entra por parametro <br/>
-		 * @param Oferta - oferta a eliminar. oferta != null
-		 * @throws Exception - Cualquier error que se genere eliminando al oferta.
-		 */
-		public void deleteOferta(Oferta oferta) throws Exception 
+	}
+
+
+
+	/**
+	 * Metodo que modela la transaccion que actualiza en la base de datos al servicioDeAlojamiento que entra por parametro.<br/>
+	 * Solamente se actualiza si existe el servicioDeAlojamiento en la Base de Datos <br/>
+	 * <b> post: </b> se ha actualizado el servicioDeAlojamiento que entra como parametro <br/>
+	 * @param servicioDeAlojamiento - ServicioDeAlojamiento a actualizar. servicioDeAlojamiento != null
+	 * @throws Exception - Cualquier error que se genere actualizando al servicioDeAlojamiento.
+	 */
+	public void updateServicioDeAlojamiento(ServicioDeAlojamiento servicioDeAlojamiento) throws Exception 
+	{
+		DAOServicioDeAlojamiento daoServicioDeAlojamiento = new DAOServicioDeAlojamiento( );
+		try
 		{
-			DAOOferta daoOferta = new DAOOferta( );
-			try
-			{
-				this.conn = darConexion();
-				daoOferta.setConn( conn );
-				if(daoOferta.findOfertaById(oferta.getIdOferta()) != null)
-				{daoOferta.deleteOferta(oferta);}
-				else
-				{throw new Exception("La oferta con ID " + oferta.getIdOferta() + " no se encuentra en la base de datos");}
-			}
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoOferta.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
-				}
-			}	
+			this.conn = darConexion();
+			daoServicioDeAlojamiento.setConn( conn );
+			if(daoServicioDeAlojamiento.findServicioDeAlojamientoByIds(servicioDeAlojamiento.getIdServicio(),servicioDeAlojamiento.getIdAlojamiento()) !=null)
+			{daoServicioDeAlojamiento.updateServicioDeAlojamiento(servicioDeAlojamiento);}
+			else
+			{throw new Exception("El servicioDeAlojamiento con el IDSERVICIO " + servicioDeAlojamiento.getIdServicio() + " y el IDALOJAMIENTO " + servicioDeAlojamiento.getIdAlojamiento() +  " no se encuentra en la base de datos");}
 		}
-		
-		public List<Pago> getPagosOperadores( ) throws Exception {
-			DAOOperador daoOperador = new DAOOperador();
-			List<Pago> pagos = null;
-			try
-			{
-				this.conn = darConexion();
-				daoOperador.setConn(conn);
-				pagos = daoOperador.darPagos();
-				if(pagos.isEmpty())
-				{
-					throw new Exception("Aun no se ha pagado a ningun operador entre el anio actual y el anio corrido.");				
-				}
-			} 
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			} 
-			finally {
-				try {
-					daoOperador.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoServicioDeAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
 				}
 			}
-			return pagos;
-		}
-		
-		public List<Popular> get20OfertasMasPopulares( ) throws Exception {
-			DAOOferta daoOferta = new DAOOferta();
-			List<Popular> populares = null;
-			try
-			{
-				this.conn = darConexion();
-				daoOferta.setConn(conn);
-				populares = daoOferta.get20MasPopulares();
-				if(populares.isEmpty())
-				{
-					throw new Exception("No hay ofertas de las que se hayan reservado alojamientos.");				
-				}
-			} 
-			catch (SQLException sqlException) {
-				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-				sqlException.printStackTrace();
-				throw sqlException;
-			} 
-			catch (Exception exception) {
-				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
 				throw exception;
-			} 
-			finally {
-				try {
-					daoOferta.cerrarRecursos();
-					if(this.conn!=null){
-						this.conn.close();					
-					}
-				}
-				catch (SQLException exception) {
-					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-					exception.printStackTrace();
-					throw exception;
+			}
+		}	
+	}
+	/**
+	 * Metodo que modela la transaccion que elimina de la base de datos al servicioDeAlojamiento que entra por parametro. <br/>
+	 * Solamente se actualiza si existe el servicioDeAlojamiento en la Base de Datos <br/>
+	 * <b> post: </b> se ha eliminado el servicioDeAlojamiento que entra por parametro <br/>
+	 * @param ServicioDeAlojamiento - servicioDeAlojamiento a eliminar. servicioDeAlojamiento != null
+	 * @throws Exception - Cualquier error que se genere eliminando al servicioDeAlojamiento.
+	 */
+	public void deleteServicioDeAlojamiento(ServicioDeAlojamiento servicioDeAlojamiento) throws Exception 
+	{
+		DAOServicioDeAlojamiento daoServicioDeAlojamiento = new DAOServicioDeAlojamiento( );
+		try
+		{
+			this.conn = darConexion();
+			daoServicioDeAlojamiento.setConn( conn );
+			if(daoServicioDeAlojamiento.findServicioDeAlojamientoByIds(servicioDeAlojamiento.getIdServicio(),servicioDeAlojamiento.getIdAlojamiento()) != null )
+			{daoServicioDeAlojamiento.deleteServicioDeAlojamiento(servicioDeAlojamiento);}
+			else
+			{throw new Exception("La servicioDeAlojamiento con IDSERVICIO " + servicioDeAlojamiento.getIdServicio() + " y con IDALOJAMIENTO = " + servicioDeAlojamiento.getIdAlojamiento() + " no se encuentra en la base de datos");}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoServicioDeAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
 				}
 			}
-			return populares;
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}	
+	}
+
+	//----------------------------------------------------------------------------------------------------------------------------------
+	// TRANSACCIONES DE LA TABLA AlojamientosDeOferta
+	//----------------------------------------------------------------------------------------------------------------------------------	
+
+	/**
+	 * Metodo que modela la transaccion que retorna todos los alojamientosDeOferta de la base de datos. <br/>
+	 * @return List<AlojamientoDeOferta> - Lista de alojamientosDeOferta que contiene el resultado de la consulta.
+	 * @throws Exception -  Cualquier error que se genere durante la transaccion
+	 */
+	public List<AlojamientosDeOferta> getAllAlojamientosDeOferta() throws Exception {
+		DAOAlojamientosDeOferta daoAlojamientoDeOferta = new DAOAlojamientosDeOferta();
+		List<AlojamientosDeOferta> alojamientosDeOferta;
+		try 
+		{
+			this.conn = darConexion();
+			daoAlojamientoDeOferta.setConn(conn);
+			alojamientosDeOferta = daoAlojamientoDeOferta.getAlojamientosDeOfertas();
 		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoAlojamientoDeOferta.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return alojamientosDeOferta;
+	}
+
+	/**
+	 * Metodo que modela la transaccion que busca el alojamientoDeOferta en la base de datos que tiene el ID dado por parametro. <br/>
+	 * @param name -id del alojamientoDeOferta a buscar. id != null
+	 * @return AlojamientoDeOferta - AlojamientoDeOferta que se obtiene como resultado de la consulta.
+	 * @throws Exception -  cualquier error que se genere durante la transaccion
+	 */
+	public AlojamientosDeOferta getAlojamientoDeOfertaByIds(Long id1,Long id2) throws Exception {
+		DAOAlojamientosDeOferta daoAlojamientoDeOferta = new DAOAlojamientosDeOferta();
+		AlojamientosDeOferta alojamientoDeOferta = null;
+		try 
+		{
+			this.conn = darConexion();
+			daoAlojamientoDeOferta.setConn(conn);
+			alojamientoDeOferta = daoAlojamientoDeOferta.findAlojamientosDeOfertaById(id1, id2);
+			if(alojamientoDeOferta == null)
+			{
+				throw new Exception("El alojamientoDeOferta con el idServicio = " + id1+ "y con el idOfertaAlojamiento = "+ id2 + " no se encuentra persistido en la base de datos.");				
+			}
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoAlojamientoDeOferta.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return alojamientoDeOferta;
+	}
+
+	/**
+	 * Metodo que modela la transaccion que agrega un alojamientoDeOferta a la base de datos. <br/>
+	 * <b> post: </b> se ha agregado el alojamientoDeOferta que entra como parametro <br/>
+	 * @param alojamientoDeOferta - el alojamientoDeOferta a agregar. alojamientoDeOferta != null
+	 * @throws Exception - Cualquier error que se genere agregando el alojamientoDeOferta
+	 */
+	public void addAlojamientoDeOferta(AlojamientosDeOferta alojamientoDeOferta) throws Exception 
+	{
+
+		DAOAlojamientosDeOferta daoAlojamientoDeOferta = new DAOAlojamientosDeOferta( );
+		try
+		{
+			this.conn = darConexion();
+			daoAlojamientoDeOferta.setConn(conn);
+			daoAlojamientoDeOferta.addAlojamientosDeOferta(alojamientoDeOferta);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoAlojamientoDeOferta.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+	}
+
+	/**
+	 * Metodo que modela la transaccion que elimina de la base de datos al alojamientoDeOferta que entra por parametro. <br/>
+	 * Solamente se actualiza si existe el alojamientoDeOferta en la Base de Datos <br/>
+	 * <b> post: </b> se ha eliminado el alojamientoDeOferta que entra por parametro <br/>
+	 * @param AlojamientoDeOferta - alojamientoDeOferta a eliminar. alojamientoDeOferta != null
+	 * @throws Exception - Cualquier error que se genere eliminando al alojamientoDeOferta.
+	 */
+	public void deleteAlojamientoDeOferta(AlojamientosDeOferta alojamientoDeOferta) throws Exception 
+	{
+		DAOAlojamientosDeOferta daoAlojamientoDeOferta = new DAOAlojamientosDeOferta( );
+		try
+		{
+			this.conn = darConexion();
+			daoAlojamientoDeOferta.setConn( conn );
+			if(daoAlojamientoDeOferta.findAlojamientosDeOfertaById(alojamientoDeOferta.getIdOferta(),alojamientoDeOferta.getIdAlojamiento()) != null )
+			{daoAlojamientoDeOferta.deleteAlojamientosDeOferta(alojamientoDeOferta);}
+			else
+			{throw new Exception("La alojamientoDeOferta con IDSERVICIO " + alojamientoDeOferta.getIdOferta() + " y con IDALOJAMIENTO = " + alojamientoDeOferta.getIdAlojamiento() + " no se encuentra en la base de datos");}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoAlojamientoDeOferta.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}	
+	}
+	//----------------------------------------------------------------------------------------------------------------------------------
+	// TRANSACCIONES DE LA TABLA OFERTAS
+	//----------------------------------------------------------------------------------------------------------------------------------	
+
+	/**
+	 * Metodo que modela la transaccion que retorna todos los ofertas de la base de datos. <br/>
+	 * @return List<Oferta> - Lista de ofertas que contiene el resultado de la consulta.
+	 * @throws Exception -  Cualquier error que se genere durante la transaccion
+	 */
+	public List<Oferta> getAllOfertas() throws Exception {
+		DAOOferta daoOferta = new DAOOferta();
+		List<Oferta> ofertas;
+		try 
+		{
+			this.conn = darConexion();
+			daoOferta.setConn(conn);
+			ofertas = daoOferta.getOfertas();
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoOferta.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return ofertas;
+	}
+
+	/**
+	 * Metodo que modela la transaccion que busca el oferta en la base de datos que tiene el ID dado por parametro. <br/>
+	 * @param name -id del oferta a buscar. id != null
+	 * @return Oferta - Oferta que se obtiene como resultado de la consulta.
+	 * @throws Exception -  cualquier error que se genere durante la transaccion
+	 */
+	public Oferta getOfertaById(Long id) throws Exception {
+		DAOOferta daoOferta = new DAOOferta();
+		Oferta oferta = null;
+		try 
+		{
+			this.conn = darConexion();
+			daoOferta.setConn(conn);
+			oferta = daoOferta.findOfertaById(id);
+			if(oferta == null)
+			{
+				throw new Exception("El oferta con el id = " + id + " no se encuentra persistido en la base de datos.");				
+			}
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoOferta.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return oferta;
+	}
+
+	/**
+	 * Metodo que modela la transaccion que agrega un oferta a la base de datos. <br/>
+	 * <b> post: </b> se ha agregado el oferta que entra como parametro <br/>
+	 * @param oferta - el oferta a agregar. oferta != null
+	 * @throws Exception - Cualquier error que se genere agregando el oferta
+	 */
+	public void addOferta(Oferta oferta) throws Exception 
+	{
+
+		DAOOferta daoOferta = new DAOOferta( );
+		try
+		{
+			this.conn = darConexion();
+			daoOferta.setConn(conn);
+			daoOferta.addOferta(oferta);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoOferta.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+	}
+
+
+
+	/**
+	 * Metodo que modela la transaccion que actualiza en la base de datos al oferta que entra por parametro.<br/>
+	 * Solamente se actualiza si existe el oferta en la Base de Datos <br/>
+	 * <b> post: </b> se ha actualizado el oferta que entra como parametro <br/>
+	 * @param oferta - Oferta a actualizar. oferta != null
+	 * @throws Exception - Cualquier error que se genere actualizando al oferta.
+	 */
+	public void updateOferta(Oferta oferta) throws Exception 
+	{
+		DAOOferta daoOferta = new DAOOferta( );
+		try
+		{
+			this.conn = darConexion();
+			daoOferta.setConn( conn );
+			if(daoOferta.findOfertaById(oferta.getIdOferta()) !=null)
+			{daoOferta.updateOferta(oferta);}
+			else
+			{throw new Exception("La oferta con el ID " + oferta.getIdOferta() + " no se encuentra en la base de datos");}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoOferta.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}	
+	}
+	/**
+	 * Metodo que modela la transaccion que elimina de la base de datos al oferta que entra por parametro. <br/>
+	 * Solamente se actualiza si existe el oferta en la Base de Datos <br/>
+	 * <b> post: </b> se ha eliminado el oferta que entra por parametro <br/>
+	 * @param Oferta - oferta a eliminar. oferta != null
+	 * @throws Exception - Cualquier error que se genere eliminando al oferta.
+	 */
+	public void deleteOferta(Oferta oferta) throws Exception 
+	{
+		DAOOferta daoOferta = new DAOOferta( );
+		try
+		{
+			this.conn = darConexion();
+			daoOferta.setConn( conn );
+			if(daoOferta.findOfertaById(oferta.getIdOferta()) != null)
+			{daoOferta.deleteOferta(oferta);}
+			else
+			{throw new Exception("La oferta con ID " + oferta.getIdOferta() + " no se encuentra en la base de datos");}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoOferta.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}	
+	}
+
+	public List<Pago> getPagosOperadores( ) throws Exception {
+		DAOOperador daoOperador = new DAOOperador();
+		List<Pago> pagos = null;
+		try
+		{
+			this.conn = darConexion();
+			daoOperador.setConn(conn);
+			pagos = daoOperador.darPagos();
+			if(pagos.isEmpty())
+			{
+				throw new Exception("Aun no se ha pagado a ningun operador entre el anio actual y el anio corrido.");				
+			}
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoOperador.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return pagos;
+	}
+
+	public List<Popular> get20OfertasMasPopulares( ) throws Exception {
+		DAOOferta daoOferta = new DAOOferta();
+		List<Popular> populares = null;
+		try
+		{
+			this.conn = darConexion();
+			daoOferta.setConn(conn);
+			populares = daoOferta.get20MasPopulares();
+			if(populares.isEmpty())
+			{
+				throw new Exception("No hay ofertas de las que se hayan reservado alojamientos.");				
+			}
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoOferta.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return populares;
+	}
+
+	//----------------------------------------------------------------------------------------------------------------------------------
+	// TRANSACCIONES DE LA TABLA RESERVASDEALOJAMIENTO
+	//----------------------------------------------------------------------------------------------------------------------------------	
+
+	/**
+	 * Metodo que modela la transaccion que retorna todos los serviciosDeAlojamiento de la base de datos. <br/>
+	 * @return List<ReservasDeAlojamiento> - Lista de serviciosDeAlojamiento que contiene el resultado de la consulta.
+	 * @throws Exception -  Cualquier error que se genere durante la transaccion
+	 */
+	public List<ReservasDeAlojamiento> getAllReservasDeAlojamiento() throws Exception {
+		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento();
+		List<ReservasDeAlojamiento> serviciosDeAlojamiento;
+		try 
+		{
+			this.conn = darConexion();
+			daoReservasDeAlojamiento.setConn(conn);
+			serviciosDeAlojamiento = daoReservasDeAlojamiento.getAllReservassDeAlojamiento();
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReservasDeAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return serviciosDeAlojamiento;
+	}
+
+	/**
+	 * Metodo que modela la transaccion que busca el reservaDeAlojamiento en la base de datos que tiene el ID dado por parametro. <br/>
+	 * @param name -id del reservaDeAlojamiento a buscar. id != null
+	 * @return ReservasDeAlojamiento - ReservasDeAlojamiento que se obtiene como resultado de la consulta.
+	 * @throws Exception -  cualquier error que se genere durante la transaccion
+	 */
+	public ReservasDeAlojamiento getReservasDeAlojamientoByIds(Long id1,Long id2) throws Exception {
+		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento();
+		ReservasDeAlojamiento reservaDeAlojamiento = null;
+		try 
+		{
+			this.conn = darConexion();
+			daoReservasDeAlojamiento.setConn(conn);
+			reservaDeAlojamiento = daoReservasDeAlojamiento.findReservasDeAlojamientoByIds(id1, id2);
+			if(reservaDeAlojamiento == null)
+			{
+				throw new Exception("El reservaDeAlojamiento con el idReserva = " + id1+ "y con el idOfertaAlojamiento = "+ id2 + " no se encuentra persistido en la base de datos.");				
+			}
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReservasDeAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return reservaDeAlojamiento;
+	}
+
+	/**
+	 * Metodo que modela la transaccion que agrega un reservaDeAlojamiento a la base de datos. <br/>
+	 * <b> post: </b> se ha agregado el reservaDeAlojamiento que entra como parametro <br/>
+	 * @param reservaDeAlojamiento - el reservaDeAlojamiento a agregar. reservaDeAlojamiento != null
+	 * @throws Exception - Cualquier error que se genere agregando el reservaDeAlojamiento
+	 */
+	public void addReservasDeAlojamiento(ReservasDeAlojamiento reservaDeAlojamiento) throws Exception 
+	{
+
+		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento( );
+		try
+		{
+			this.conn = darConexion();
+			daoReservasDeAlojamiento.setConn(conn);
+			daoReservasDeAlojamiento.addReservasDeAlojamiento(reservaDeAlojamiento);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReservasDeAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+	}
+
+
+
+	/**
+	 * Metodo que modela la transaccion que actualiza en la base de datos al reservaDeAlojamiento que entra por parametro.<br/>
+	 * Solamente se actualiza si existe el reservaDeAlojamiento en la Base de Datos <br/>
+	 * <b> post: </b> se ha actualizado el reservaDeAlojamiento que entra como parametro <br/>
+	 * @param reservaDeAlojamiento - ReservasDeAlojamiento a actualizar. reservaDeAlojamiento != null
+	 * @throws Exception - Cualquier error que se genere actualizando al reservaDeAlojamiento.
+	 */
+	public void updateReservasDeAlojamiento(ReservasDeAlojamiento reservaDeAlojamiento) throws Exception 
+	{
+		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento( );
+		try
+		{
+			this.conn = darConexion();
+			daoReservasDeAlojamiento.setConn( conn );
+			if(daoReservasDeAlojamiento.findReservasDeAlojamientoByIds(reservaDeAlojamiento.getIdReserva(),reservaDeAlojamiento.getIdAlojamiento()) !=null)
+			{daoReservasDeAlojamiento.updateReservasDeAlojamiento(reservaDeAlojamiento);}
+			else
+			{throw new Exception("El reservaDeAlojamiento con el idReserva " + reservaDeAlojamiento.getIdReserva() + " y el IDALOJAMIENTO " + reservaDeAlojamiento.getIdAlojamiento() +  " no se encuentra en la base de datos");}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReservasDeAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}	
+	}
+	/**
+	 * Metodo que modela la transaccion que elimina de la base de datos al reservaDeAlojamiento que entra por parametro. <br/>
+	 * Solamente se actualiza si existe el reservaDeAlojamiento en la Base de Datos <br/>
+	 * <b> post: </b> se ha eliminado el reservaDeAlojamiento que entra por parametro <br/>
+	 * @param ReservasDeAlojamiento - reservaDeAlojamiento a eliminar. reservaDeAlojamiento != null
+	 * @throws Exception - Cualquier error que se genere eliminando al reservaDeAlojamiento.
+	 */
+	public void deleteReservasDeAlojamiento(ReservasDeAlojamiento reservaDeAlojamiento) throws Exception 
+	{
+		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento( );
+		try
+		{
+			this.conn = darConexion();
+			daoReservasDeAlojamiento.setConn( conn );
+			if(daoReservasDeAlojamiento.findReservasDeAlojamientoByIds(reservaDeAlojamiento.getIdReserva(),reservaDeAlojamiento.getIdAlojamiento()) != null )
+			{daoReservasDeAlojamiento.deleteReservasDeAlojamiento(reservaDeAlojamiento);}
+			else
+			{throw new Exception("La reservaDeAlojamiento con IDRESERVA " + reservaDeAlojamiento.getIdReserva() + " y con IDALOJAMIENTO = " + reservaDeAlojamiento.getIdAlojamiento() + " no se encuentra en la base de datos");}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReservasDeAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}	
+	}
 }
