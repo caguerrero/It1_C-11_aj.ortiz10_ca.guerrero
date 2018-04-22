@@ -199,7 +199,8 @@ public class DAOAlojamiento {
 		Long idAlojamiento = resultSet.getLong("IDALOJAMIENTO");
 		double tamaño = resultSet.getDouble("TAMAÑO");
 		String ubicacion = resultSet.getString("UBICACION");
-		Alojamiento ofAlojamiento = new Alojamiento(capacidad, idAlojamiento, tamaño, ubicacion);
+		int habilitado = resultSet.getInt("HABILITADO");
+		Alojamiento ofAlojamiento = new Alojamiento(capacidad, idAlojamiento, tamaño, ubicacion, habilitado);
 		return ofAlojamiento;
 	}
 }

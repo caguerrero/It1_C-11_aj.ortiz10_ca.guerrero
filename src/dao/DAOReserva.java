@@ -1,6 +1,5 @@
 package dao;
 
-
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -108,7 +107,7 @@ public class DAOReserva {
 	 */
 	public void addReserva(Reserva reserva) throws SQLException, Exception {
 
-		String sql = String.format("INSERT INTO %1$s.RESERVA (FECHARESERVA, FINESTADIA, IDRESERVA, INICIOESTADIA, PRECIO, IDCLIENTE, IDOFERTA) VALUES (TO_DATE('%2$s', 'YYYY-MM-DD'), TO_DATE('%3$s', 'YYYY-MM-DD'), %4$s, TO_DATE('%5$s', 'YYYY-MM-DD'), %6$s,%7$s,%8$s)", 
+		String sql = String.format("INSERT INTO %1$s.RESERVA (FECHARESERVA, FINESTADIA, IDRESERVA, INICIOESTADIA, PRECIO, IDCLIENTE, IDALOJAMIENTO, CANCELADO) VALUES (TO_DATE('%2$s', 'YYYY-MM-DD'), TO_DATE('%3$s', 'YYYY-MM-DD'), %4$s, TO_DATE('%5$s', 'YYYY-MM-DD'), %6$s,%7$s,%8$s)",
 				USUARIO,
 				reserva.getFechaReserva(),
 				reserva.getFinEstadia(),
@@ -116,13 +115,13 @@ public class DAOReserva {
 				reserva.getInicioEstadia(),
 				reserva.getPrecio(),
 				reserva.getIdCliente(), 
-				reserva.getIdOferta());
+				reserva.getIdAlojamiento(),
+		        reserva.getCancelado());
 		System.out.println(sql);
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
-
 	}
 
 	/**
@@ -137,9 +136,9 @@ public class DAOReserva {
 		StringBuilder sql = new StringBuilder();
 		sql.append (String.format ("UPDATE %1s.RESERVA ", USUARIO));
 		sql.append (String.format (
-				"SET FECHARESERVA = TO_DATE('%2$s', 'YYYY-MM-DD'), FINESTADIA = TO_DATE('%3$s', 'YYYY-MM-DD'), IDCLIENTE = %4$s, IDOFERTA = '%5$s' , INICIOESTADIA = TO_DATE('%6$s', 'YYYY-MM-DD'), PRECIO = '%7$s'",
+				"SET FECHARESERVA = TO_DATE('%2$s', 'YYYY-MM-DD'), FINESTADIA = TO_DATE('%3$s', 'YYYY-MM-DD'), IDCLIENTE = %4$s, IDOFERTA = %5$s , INICIOESTADIA = TO_DATE('%6$s', 'YYYY-MM-DD'), PRECIO = %7$s",
 				reserva.getFechaReserva(), reserva.getFinEstadia(), reserva.getIdCliente(),
-				reserva.getIdOferta(), reserva.getInicioEstadia(), reserva.getPrecio()));
+				reserva.getIdAlojamiento(), reserva.getInicioEstadia(), reserva.getPrecio()));
 		sql.append ("WHERE IDRESERVA = " + reserva.getIdReserva());
 		System.out.println(sql);
 
@@ -150,7 +149,7 @@ public class DAOReserva {
 
 	/**
 	 * Metodo que actualiza la informacion del reserva en la Base de Datos que tiene el identificador dado por parametro<br/>
-	 * <b>Precondicion: </b> la conexion a sido inicializadoa <br/>  
+	 * <b>Precondicion: </b> la conexion a sido inicializadoa <br/> 
 	 * @param reserva Reserva que desea actualizar a la Base de Datos
 	 * @throws SQLException SQLException Genera excepcion si hay error en la conexion o en la consulta SQL
 	 * @throws Exception Si se genera un error dentro del metodo.
@@ -205,12 +204,13 @@ public class DAOReserva {
 		Date fechaReserva = resultSet.getDate("FECHARESERVA");
 		Date finEstadia = resultSet.getDate("FINESTADIA");
 		Long idCliente = resultSet.getLong("IDCLIENTE");
-		Long idOferta = resultSet.getLong("IDOFERTA");
+		Long idAlojamiento = resultSet.getLong("IDALOJAMIENTO");
 		Long idReserva = resultSet.getLong("IDRESERVA");
 		Date inicioEstadia = resultSet.getDate("INICIOESTADIA");
 		double precio = resultSet.getDouble("PRECIO");
-
-		Reserva res = new Reserva(fechaReserva, finEstadia, idReserva, inicioEstadia, precio, idCliente, idOferta);
+		int cancelado = resultSet.getInt("CANCELADO");
+		
+		Reserva res = new Reserva(fechaReserva, finEstadia, idReserva, inicioEstadia, precio, idCliente, idAlojamiento, cancelado);
 
 		return res;
 	}

@@ -1,5 +1,7 @@
 package vos;
 
+import java.sql.Date;
+
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Alojamiento {
@@ -15,19 +17,29 @@ public class Alojamiento {
 	
 	@JsonProperty(value="ubicacion")
 	private String ubicacion;
-
+	
+	@JsonProperty(value="habilitado")
+	private int habilitado;
+	
+	@JsonProperty(value="fecha_apertura")
+	private Date fecha_apertura;
+	
 	/**
 	 * @param capacidad
 	 * @param idOfertaAlojamiento
 	 * @param tamaño
 	 * @param ubicacion
+	 * @param habilitado
+	 * @param fecha_apertura
 	 */
 	public Alojamiento(@JsonProperty(value="capacidad")int capacidad, @JsonProperty(value="idAlojamiento")Long idAlojamiento, 
-			@JsonProperty(value="tamaño")double tamaño, @JsonProperty(value="ubicacion")String ubicacion) {
+			@JsonProperty(value="tamaño")double tamaño, @JsonProperty(value="ubicacion")String ubicacion, @JsonProperty(value="habilitado")int habilitado, @JsonProperty(value="fecha_apertura")Date fecha_apertura) {
 		this.capacidad = capacidad;
 		this.idAlojamiento = idAlojamiento;
 		this.tamaño = tamaño;
 		this.ubicacion = ubicacion;
+		this.habilitado = habilitado;
+		this.fecha_apertura = fecha_apertura;
 	}
 
 	/**
@@ -84,5 +96,21 @@ public class Alojamiento {
 	 */
 	public void setUbicacion(String ubicacion) {
 		this.ubicacion = ubicacion;
-	}	
+	}
+
+	public int getHabilitado() {
+		return habilitado;
+	}
+
+	public void setHabilitado(int habilitado) {
+		this.habilitado = habilitado;
+	}
+
+	public Date getFecha_apertura() {
+		return fecha_apertura;
+	}
+
+	public void setFecha_apertura(Date fecha_apertura) {
+		this.fecha_apertura = fecha_apertura;
+	}
 }

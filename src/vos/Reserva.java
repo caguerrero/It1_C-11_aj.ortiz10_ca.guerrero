@@ -24,10 +24,8 @@ public class Reserva {
 	@JsonProperty(value="idCliente")
 	private Long idCliente;
 	
-	@JsonProperty(value="idOferta")
-	private Long idOferta;
-
-	
+	@JsonProperty(value="cancelado")
+	private int cancelado;
 	/**
 	 * @param fechaReserva
 	 * @param finEstadia
@@ -36,16 +34,17 @@ public class Reserva {
 	 * @param precio
 	 * @param idCliente
 	 * @param idAlojamiento
+	 * @param cancelado
 	 */
 	public Reserva(@JsonProperty(value="fechaReserva")Date fechaReserva, @JsonProperty(value="finEstadia")Date finEstadia, @JsonProperty(value="idReserva")Long idReserva, @JsonProperty(value="inicioEstadia")Date inicioEstadia, 
-			@JsonProperty(value="precio")double precio, @JsonProperty(value="idCliente")Long idCliente,@JsonProperty(value="idOferta")Long idAlojamiento) {
+			@JsonProperty(value="precio")double precio, @JsonProperty(value="idCliente")Long idCliente, @JsonProperty(value="cancelado")int cancelado) {
 		this.fechaReserva = fechaReserva;
 		this.finEstadia = finEstadia;
 		this.idReserva = idReserva;
 		this.inicioEstadia = inicioEstadia;
 		this.precio = precio;
 		this.idCliente = idCliente;
-		this.idOferta = idAlojamiento;
+		this.cancelado = cancelado;
 	}
 
 	/**
@@ -133,16 +132,16 @@ public class Reserva {
 	}
 
 	/**
-	 * @return the idOfertaAlojamiento
+	 * @return the cancelado
 	 */
-	public Long getIdOferta() {
-		return idOferta;
+	public int getCancelado() {
+		return cancelado;
 	}
 
 	/**
-	 * @param idAlojamiento the idOfertaAlojamiento to set
+	 * @param cancelado the cancelado to set
 	 */
-	public void setIdOferta(Long idAlojamiento) {
-		this.idOferta = idAlojamiento;
+	public void setCancelado(int cancelado) {
+		this.cancelado = cancelado;
 	}
 }

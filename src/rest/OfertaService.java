@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response;
 
 import tm.AlohAndesTransactionManager;
 import vos.Oferta;
+import vos.Popular;
 
 @Path("ofertas")
 public class OfertaService {
@@ -167,6 +168,23 @@ public class OfertaService {
 		catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	@GET
+	@Path( "masPopulares" )
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response get20MasPopulares() {
+
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
+
+			List<Popular> populares;
+			populares = tm.get20OfertasMasPopulares();
+			return Response.status(200).entity(populares).build();
+		} 
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
 		}
 	}
 }

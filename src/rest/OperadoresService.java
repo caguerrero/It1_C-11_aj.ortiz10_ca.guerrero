@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 
 import tm.AlohAndesTransactionManager;
 import vos.Operador;
+import vos.Pago;
 
 @Path("operadores")
 public class OperadoresService {
@@ -172,4 +173,21 @@ public class OperadoresService {
 		}
 	}
 
+	@GET
+	@Path( "pagos" )
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getPagosOperadores( )
+	{
+		try{
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager( getPath( ) );
+
+			List<Pago> pagos;
+			pagos = tm.getPagosOperadores();
+			return Response.status( 200 ).entity( pagos ).build( );
+		}
+		catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
 }

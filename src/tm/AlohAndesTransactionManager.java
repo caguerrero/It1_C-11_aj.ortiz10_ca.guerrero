@@ -26,6 +26,8 @@ import vos.Oferta;
 import vos.Alojamiento;
 import vos.AlojamientosDeOferta;
 import vos.Operador;
+import vos.Pago;
+import vos.Popular;
 import vos.Reserva;
 import vos.Servicio;
 import vos.ServicioDeAlojamiento;
@@ -2253,5 +2255,83 @@ public class AlohAndesTransactionManager {
 					throw exception;
 				}
 			}	
+		}
+		
+		public List<Pago> getPagosOperadores( ) throws Exception {
+			DAOOperador daoOperador = new DAOOperador();
+			List<Pago> pagos = null;
+			try
+			{
+				this.conn = darConexion();
+				daoOperador.setConn(conn);
+				pagos = daoOperador.darPagos();
+				if(pagos.isEmpty())
+				{
+					throw new Exception("Aun no se ha pagado a ningun operador entre el anio actual y el anio corrido.");				
+				}
+			} 
+			catch (SQLException sqlException) {
+				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+				sqlException.printStackTrace();
+				throw sqlException;
+			} 
+			catch (Exception exception) {
+				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			} 
+			finally {
+				try {
+					daoOperador.cerrarRecursos();
+					if(this.conn!=null){
+						this.conn.close();					
+					}
+				}
+				catch (SQLException exception) {
+					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+					exception.printStackTrace();
+					throw exception;
+				}
+			}
+			return pagos;
+		}
+		
+		public List<Popular> get20OfertasMasPopulares( ) throws Exception {
+			DAOOferta daoOferta = new DAOOferta();
+			List<Popular> populares = null;
+			try
+			{
+				this.conn = darConexion();
+				daoOferta.setConn(conn);
+				populares = daoOferta.get20MasPopulares();
+				if(populares.isEmpty())
+				{
+					throw new Exception("No hay ofertas de las que se hayan reservado alojamientos.");				
+				}
+			} 
+			catch (SQLException sqlException) {
+				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+				sqlException.printStackTrace();
+				throw sqlException;
+			} 
+			catch (Exception exception) {
+				System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			} 
+			finally {
+				try {
+					daoOferta.cerrarRecursos();
+					if(this.conn!=null){
+						this.conn.close();					
+					}
+				}
+				catch (SQLException exception) {
+					System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+					exception.printStackTrace();
+					throw exception;
+				}
+			}
+			return populares;
 		}
 }

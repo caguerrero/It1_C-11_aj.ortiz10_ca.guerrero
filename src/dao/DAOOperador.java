@@ -1,12 +1,10 @@
 package dao;
 
-
 import java.sql.Connection; 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import vos.*;
 
 public class DAOOperador {
@@ -160,7 +158,25 @@ public class DAOOperador {
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
 	}
+	
+	public ArrayList<Pago> darPagos() throws SQLException, Exception
+	{
+		    ArrayList<Pago> pagos = new ArrayList<Pago>();
+			String sql = String.format("SELECT OP.NOMBRE, OP.CEDULA_NIT, NVL(SUM(PRECIO), 0) AS DINERO_RECIBIDO " + 
+					"FROM %1$s.RESERVA R RIGHT JOIN %1$s.ALOJAMIENTOSDEOFERTA AO ON R.IDALOJAMIENTO = AO.IDALOJAMIENTO " + 
+					"RIGHT JOIN %1$s.OFERTA O ON AO.IDOFERTA = O.IDOFERTA " + 
+					"RIGHT JOIN %1$s.OPERADORES OP ON O.IDOPERADOR = OP.CEDULA_NIT WHERE CANCELADO = 1 AND R.FINESTADIA BETWEEN SYSDATE - 365 AND SYSDATE " + 
+					"GROUP BY OP.NOMBRE, OP.CEDULA_NIT, R.FINESTADIA ORDER BY R.FINESTADIA", USUARIO);
+			PreparedStatement prepStmt = conn.prepareStatement(sql);
+			recursos.add(prepStmt);
+			ResultSet rs = prepStmt.executeQuery();
 
+			while(rs.next()) {
+				pagos.add(convertResultSetToPago(rs));
+			}
+			return pagos;
+	}
+	
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// METODOS AUXILIARES
 	//----------------------------------------------------------------------------------------------------------------------------------
@@ -205,5 +221,16 @@ public class DAOOperador {
 		Operador op = new Operador(cedula_NIT, direccion, nombre, tipo);
 
 		return op;
+	}
+	
+	public Pago convertResultSetToPago(ResultSet resultSet) throws SQLException {
+
+		Long cedulaOp = resultSet.getLong("CEDULA_NIT");
+		String nombreOp = resultSet.getString("NOMBRE");
+		Double monto = resultSet.getDouble("DINERO_RECIBIDO");
+
+		Pago pago = new Pago(monto, nombreOp, cedulaOp);
+
+		return pago;
 	}
 }

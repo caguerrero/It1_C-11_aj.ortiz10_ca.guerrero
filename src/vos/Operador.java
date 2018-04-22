@@ -13,7 +13,7 @@ public class Operador {
 	@JsonProperty(value="nombre")
 	private String nombre;
 
-	@JsonProperty(value = "tipo")
+	@JsonProperty(value="tipo")
 	private String tipo;
 	/**
 	 * @param cedula_NIT
@@ -83,6 +83,4 @@ public class Operador {
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
-	
-	
 }

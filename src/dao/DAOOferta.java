@@ -162,6 +162,25 @@ public class DAOOferta {
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
 	}
+	
+	public ArrayList<Popular> get20MasPopulares() throws SQLException, Exception {
+		ArrayList<Popular> populares = new ArrayList<Popular>();
+		String sql = String.format("SELECT * FROM( SELECT IDOFERTA, SUM(CantReservas) as CantReservas" + 
+				" FROM (SELECT IDOFERTA, CantReservas" + 
+				" FROM %1$s.ALOJAMIENTOSDEOFERTA " + 
+				" NATURAL JOIN (SELECT IDALOJAMIENTO, COUNT(*) AS CantReservas" + 
+				" FROM %1$s.RESERVA GROUP BY IDALOJAMIENTO))" + 
+				" GROUP BY IDOFERTA ORDER BY CantReservas DESC) WHERE ROWNUM <= 20", USUARIO);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			populares.add(convertResultSetToPopular(rs));
+		}
+		return populares;
+	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// METODOS AUXILIARES
@@ -209,5 +228,13 @@ public class DAOOferta {
 		Oferta oferta = new Oferta(costoBase, tiempoEndias, horarioApertura, horarioCierre, idOferta, idOperador);
 
 		return oferta;
+	}
+	
+	private Popular convertResultSetToPopular(ResultSet resulSet) throws SQLException {
+		Long idOferta = resulSet.getLong("IDOFERTA");
+		int cantidadReservas = resulSet.getInt("CANTRESERVAS");
+		Popular popular = new Popular(idOferta,cantidadReservas);
+		
+		return popular;
 	}
 }
