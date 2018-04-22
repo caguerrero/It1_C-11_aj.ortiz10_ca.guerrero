@@ -1792,10 +1792,10 @@ public class AlohAndesTransactionManager {
 			{
 				this.conn = darConexion();
 				daoServicioDeAlojamiento.setConn( conn );
-				if(daoServicioDeAlojamiento.findServicioDeAlojamientoByIds(servicioDeAlojamiento.getIdServicio(),servicioDeAlojamiento.getIdOfertaAlojamiento()) !=null)
+				if(daoServicioDeAlojamiento.findServicioDeAlojamientoByIds(servicioDeAlojamiento.getIdServicio(),servicioDeAlojamiento.getIdAlojamiento()) !=null)
 				{daoServicioDeAlojamiento.updateServicioDeAlojamiento(servicioDeAlojamiento);}
 				else
-				{throw new Exception("El servicioDeAlojamiento con el IDSERVICIO " + servicioDeAlojamiento.getIdServicio() + " y el IDOFERTAALOJAMIENTO " + servicioDeAlojamiento.getIdOfertaAlojamiento() +  " no se encuentra en la base de datos");}
+				{throw new Exception("El servicioDeAlojamiento con el IDSERVICIO " + servicioDeAlojamiento.getIdServicio() + " y el IDOFERTAALOJAMIENTO " + servicioDeAlojamiento.getIdAlojamiento() +  " no se encuentra en la base de datos");}
 			}
 			catch (SQLException sqlException) {
 				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
@@ -1835,10 +1835,10 @@ public class AlohAndesTransactionManager {
 			{
 				this.conn = darConexion();
 				daoServicioDeAlojamiento.setConn( conn );
-				if(daoServicioDeAlojamiento.findServicioDeAlojamientoByIds(servicioDeAlojamiento.getIdServicio(),servicioDeAlojamiento.getIdOfertaAlojamiento()) != null )
+				if(daoServicioDeAlojamiento.findServicioDeAlojamientoByIds(servicioDeAlojamiento.getIdServicio(),servicioDeAlojamiento.getIdAlojamiento()) != null )
 				{daoServicioDeAlojamiento.deleteServicioDeAlojamiento(servicioDeAlojamiento);}
 				else
-				{throw new Exception("La servicioDeAlojamiento con IDSERVICIO " + servicioDeAlojamiento.getIdServicio() + " y con IDOFERTAALOJAMIENTO = " + servicioDeAlojamiento.getIdOfertaAlojamiento() + " no se encuentra en la base de datos");}
+				{throw new Exception("La servicioDeAlojamiento con IDSERVICIO " + servicioDeAlojamiento.getIdServicio() + " y con IDOFERTAALOJAMIENTO = " + servicioDeAlojamiento.getIdAlojamiento() + " no se encuentra en la base de datos");}
 			}
 			catch (SQLException sqlException) {
 				System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());

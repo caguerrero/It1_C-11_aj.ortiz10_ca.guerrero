@@ -7,16 +7,16 @@ public class ServicioDeAlojamiento {
 	@JsonProperty(value="idServicio")
 	private Long idServicio;
 
-	@JsonProperty(value="idOfertaAlojamiento")
-	private Long idOfertaAlojamiento;
+	@JsonProperty(value="idAlojamiento")
+	private Long idAlojamiento;
 
 	/**
 	 * @param idServicio
-	 * @param idOfertaAlojamiento
+	 * @param idAlojamiento
 	 */
-	public ServicioDeAlojamiento(@JsonProperty(value="idServicio") Long idServicio, @JsonProperty(value="idOfertaAlojamiento") Long idOfertaAlojamiento) {
+	public ServicioDeAlojamiento(@JsonProperty(value="idServicio") Long idServicio, @JsonProperty(value="idAlojamiento") Long idAlojamiento) {
 		this.idServicio = idServicio;
-		this.idOfertaAlojamiento = idOfertaAlojamiento;
+		this.idAlojamiento = idAlojamiento;
 	}
 
 	/**
@@ -34,16 +34,16 @@ public class ServicioDeAlojamiento {
 	}
 
 	/**
-	 * @return the idOfertaAlojamiento
+	 * @return the idAlojamiento
 	 */
-	public Long getIdOfertaAlojamiento() {
-		return idOfertaAlojamiento;
+	public Long getIdAlojamiento() {
+		return idAlojamiento;
 	}
 
 	/**
-	 * @param idOfertaAlojamiento the idOfertaAlojamiento to set
+	 * @param idAlojamiento the idAlojamiento to set
 	 */
-	public void setIdOfertaAlojamiento(Long idOfertaAlojamiento) {
-		this.idOfertaAlojamiento = idOfertaAlojamiento;
+	public void setIdAlojamiento(Long idAlojamiento) {
+		this.idAlojamiento = idAlojamiento;
 	}	
 }

@@ -85,7 +85,7 @@ public class DAOServicioDeAlojamiento {
 	{
 		ServicioDeAlojamiento servicioDeAlojamiento = null;
 
-		String sql = String.format("SELECT * FROM %1$s.SERVICIOSDEALOJAMIENTO WHERE IDSERVICIO = %2$d AND IDOFERTAALOJAMIENTO = %3$d", USUARIO, id1, id2); 
+		String sql = String.format("SELECT * FROM %1$s.SERVICIOSDEALOJAMIENTO WHERE IDSERVICIO = %2$d AND IDALOJAMIENTO = %3$d", USUARIO, id1, id2); 
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
@@ -107,9 +107,9 @@ public class DAOServicioDeAlojamiento {
 	 */
 	public void addServicioDeAlojamiento(ServicioDeAlojamiento servicioDeAlojamiento) throws SQLException, Exception {
 
-		String sql = String.format("INSERT INTO %1$s.SERVICIOSDEALOJAMIENTO (IDOFERTAALOJAMIENTO , IDSERVICIO) VALUES (%2$s, '%3$s')", 
+		String sql = String.format("INSERT INTO %1$s.SERVICIOSDEALOJAMIENTO (IDALOJAMIENTO , IDSERVICIO) VALUES (%2$s, '%3$s')", 
 				USUARIO, 
-				servicioDeAlojamiento.getIdOfertaAlojamiento(),
+				servicioDeAlojamiento.getIdAlojamiento(),
 				servicioDeAlojamiento.getIdServicio());
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
@@ -129,7 +129,7 @@ public class DAOServicioDeAlojamiento {
 
 		StringBuilder sql = new StringBuilder();
 		sql.append (String.format ("UPDATE %s.SERVICIOSDEALOJAMIENTO ", USUARIO));
-		sql.append ("WHERE IDSERVICIO = " + servicioDeAlojamiento.getIdServicio() + " AND IDOFERTAALOJAMIENTO = " + servicioDeAlojamiento.getIdOfertaAlojamiento());
+		sql.append ("WHERE IDSERVICIO = " + servicioDeAlojamiento.getIdServicio() + " AND IDALOJAMIENTO = " + servicioDeAlojamiento.getIdAlojamiento());
 		System.out.println(sql);
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql.toString());
@@ -146,7 +146,7 @@ public class DAOServicioDeAlojamiento {
 	 */
 	public void deleteServicioDeAlojamiento(ServicioDeAlojamiento servicioDeAlojamiento) throws SQLException, Exception {
 
-		String sql = String.format("DELETE FROM %1$s.SERVICIOSDEALOJAMIENTO WHERE IDSERVICIO = %2$d AND IDOFERTAALOJAMIENTO = %3$d", USUARIO, servicioDeAlojamiento.getIdServicio(), servicioDeAlojamiento.getIdOfertaAlojamiento());
+		String sql = String.format("DELETE FROM %1$s.SERVICIOSDEALOJAMIENTO WHERE IDSERVICIO = %2$d AND IDALOJAMIENTO = %3$d", USUARIO, servicioDeAlojamiento.getIdServicio(), servicioDeAlojamiento.getIdAlojamiento());
 
 		System.out.println(sql);
 
@@ -192,9 +192,9 @@ public class DAOServicioDeAlojamiento {
 	public ServicioDeAlojamiento convertResultSetToServicioDeAlojamiento(ResultSet resultSet) throws SQLException {
 
 		Long idServicio = resultSet.getLong("IDSERVICIO");
-		Long idOfertaAlojamiento = resultSet.getLong("IDOFERTAALOJAMIENTO");
+		Long idAlojamiento = resultSet.getLong("IDALOJAMIENTO");
 
-		ServicioDeAlojamiento serdalo = new ServicioDeAlojamiento(idServicio, idOfertaAlojamiento);
+		ServicioDeAlojamiento serdalo = new ServicioDeAlojamiento(idServicio, idAlojamiento);
 
 		return serdalo;
 	}
