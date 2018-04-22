@@ -107,15 +107,14 @@ public class DAOReserva {
 	 */
 	public void addReserva(Reserva reserva) throws SQLException, Exception {
 
-		String sql = String.format("INSERT INTO %1$s.RESERVA (FECHARESERVA, FINESTADIA, IDRESERVA, INICIOESTADIA, PRECIO, IDCLIENTE, IDALOJAMIENTO, CANCELADO) VALUES (TO_DATE('%2$s', 'YYYY-MM-DD'), TO_DATE('%3$s', 'YYYY-MM-DD'), %4$s, TO_DATE('%5$s', 'YYYY-MM-DD'), %6$s,%7$s,%8$s)",
+		String sql = String.format("INSERT INTO %1$s.RESERVA (FECHARESERVA, FINESTADIA, IDRESERVA, INICIOESTADIA, PRECIO, IDCLIENTE, CANCELADO) VALUES (TO_DATE('%2$s', 'YYYY-MM-DD'), TO_DATE('%3$s', 'YYYY-MM-DD'), %4$s, TO_DATE('%5$s', 'YYYY-MM-DD'), %6$s,%7$s)",
 				USUARIO,
 				reserva.getFechaReserva(),
 				reserva.getFinEstadia(),
 				reserva.getIdReserva(),
 				reserva.getInicioEstadia(),
 				reserva.getPrecio(),
-				reserva.getIdCliente(), 
-				reserva.getIdAlojamiento(),
+				reserva.getIdCliente(),
 		        reserva.getCancelado());
 		System.out.println(sql);
 
@@ -137,8 +136,8 @@ public class DAOReserva {
 		sql.append (String.format ("UPDATE %1s.RESERVA ", USUARIO));
 		sql.append (String.format (
 				"SET FECHARESERVA = TO_DATE('%2$s', 'YYYY-MM-DD'), FINESTADIA = TO_DATE('%3$s', 'YYYY-MM-DD'), IDCLIENTE = %4$s, IDOFERTA = %5$s , INICIOESTADIA = TO_DATE('%6$s', 'YYYY-MM-DD'), PRECIO = %7$s",
-				reserva.getFechaReserva(), reserva.getFinEstadia(), reserva.getIdCliente(),
-				reserva.getIdAlojamiento(), reserva.getInicioEstadia(), reserva.getPrecio()));
+				reserva.getFechaReserva(), reserva.getFinEstadia(), reserva.getIdCliente(), 
+				reserva.getInicioEstadia(), reserva.getPrecio()));
 		sql.append ("WHERE IDRESERVA = " + reserva.getIdReserva());
 		System.out.println(sql);
 
@@ -204,13 +203,12 @@ public class DAOReserva {
 		Date fechaReserva = resultSet.getDate("FECHARESERVA");
 		Date finEstadia = resultSet.getDate("FINESTADIA");
 		Long idCliente = resultSet.getLong("IDCLIENTE");
-		Long idAlojamiento = resultSet.getLong("IDALOJAMIENTO");
 		Long idReserva = resultSet.getLong("IDRESERVA");
 		Date inicioEstadia = resultSet.getDate("INICIOESTADIA");
 		double precio = resultSet.getDouble("PRECIO");
 		int cancelado = resultSet.getInt("CANCELADO");
 		
-		Reserva res = new Reserva(fechaReserva, finEstadia, idReserva, inicioEstadia, precio, idCliente, idAlojamiento, cancelado);
+		Reserva res = new Reserva(fechaReserva, finEstadia, idReserva, inicioEstadia, precio, idCliente, cancelado);
 
 		return res;
 	}

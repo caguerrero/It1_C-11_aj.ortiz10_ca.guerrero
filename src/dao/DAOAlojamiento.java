@@ -1,7 +1,8 @@
 package dao;
 
 
-import java.sql.Connection; 
+import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -106,12 +107,14 @@ public class DAOAlojamiento {
 	 */
 	public void addAlojamiento(Alojamiento Alojamiento) throws SQLException, Exception {
 
-		String sql = String.format("INSERT INTO %1$s.ALOJAMIENTO (IDALOJAMIENTO, CAPACIDAD, TAMAÑO, UBICACION) VALUES (%2$s, '%3$s', '%4$s', '%5$s')", 
+		String sql = String.format("INSERT INTO %1$s.ALOJAMIENTO (IDALOJAMIENTO, CAPACIDAD, TAMAÑO, UBICACION, HABILITADO, FECHA_APERTURA) VALUES (%2$s, '%3$s', '%4$s', '%5$s', '%6$s', %7$s)",
 				USUARIO, 
 				Alojamiento.getIdAlojamiento(),
 				Alojamiento.getCapacidad(),
 				Alojamiento.getTamaño(),
-				Alojamiento.getUbicacion());
+				Alojamiento.getUbicacion(),
+				Alojamiento.getHabilitado(),
+				Alojamiento.getFecha_apertura());
 		System.out.println(sql);
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
@@ -132,8 +135,8 @@ public class DAOAlojamiento {
 		StringBuilder sql = new StringBuilder();
 		sql.append (String.format ("UPDATE %s.ALOJAMIENTO ", USUARIO));
 		sql.append (String.format (
-				"SET  CAPACIDAD = '%1$s', TAMAÑO = '%2$s', UBICACION = '%3$s'",
-				Alojamiento.getCapacidad(), Alojamiento.getTamaño(), Alojamiento.getUbicacion()));
+				"SET  CAPACIDAD = '%1$s', TAMAÑO = '%2$s', UBICACION = '%3$s', HABILITADO = '%4$s', FECHAAPERTURA = '%5$s'",
+				Alojamiento.getCapacidad(), Alojamiento.getTamaño(), Alojamiento.getUbicacion(), Alojamiento.getHabilitado(), Alojamiento.getFecha_apertura()));
 		sql.append ("WHERE IDALOJAMIENTO = " + Alojamiento.getIdAlojamiento());
 		System.out.println(sql);
 
@@ -200,7 +203,8 @@ public class DAOAlojamiento {
 		double tamaño = resultSet.getDouble("TAMAÑO");
 		String ubicacion = resultSet.getString("UBICACION");
 		int habilitado = resultSet.getInt("HABILITADO");
-		Alojamiento ofAlojamiento = new Alojamiento(capacidad, idAlojamiento, tamaño, ubicacion, habilitado);
+		Date fecha_apertura = resultSet.getDate("FECHA_APERTURA");
+		Alojamiento ofAlojamiento = new Alojamiento(capacidad, idAlojamiento, tamaño, ubicacion, habilitado, fecha_apertura);
 		return ofAlojamiento;
 	}
 }

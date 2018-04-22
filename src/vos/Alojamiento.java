@@ -1,7 +1,6 @@
 package vos;
 
 import java.sql.Date;
-
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Alojamiento {
