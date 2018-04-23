@@ -174,16 +174,24 @@ public class AlojamientoService {
 	}
 	
 	@GET
-	@Path( "/filtrar" )
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getAlojamientosFiltrados(@QueryParam( "fecha1" ) Date fecha1, @QueryParam( "fecha2" ) Date fecha2, @QueryParam( "servicios" ) ArrayList<String> servicios) {
-
+	@Path( "filtrar" )
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getAlojamientosFiltrados(@QueryParam( "fecha1" ) Date fecha1, @QueryParam( "fecha2" ) Date fecha2, @QueryParam( "servicios" ) String servicios) {
+		
 		try {
-			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
-
-			List<Alojamiento> ofertasAlojamiento;
-			ofertasAlojamiento = tm.getAlojamientosFiltrados(fecha1, fecha2, servicios);
-			return Response.status(200).entity(ofertasAlojamiento).build();
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager( getPath() );
+			System.out.println("ENTRA");
+			String[] servicios1 = servicios.split(" ");
+			List<String> servicios2 = new ArrayList<String>();
+			int i = 0;
+			while(i < servicios1.length){
+				servicios2.add(servicios1[i]);
+				i++;
+			}
+			
+			List<Alojamiento> alojamientos;
+			alojamientos = tm.getAlojamientosFiltrados(fecha1, fecha2, servicios2);
+			return Response.status(200).entity(alojamientos).build();
 		} 
 		catch (Exception e) {
 			return Response.status(500).entity(doErrorMessage(e)).build();

@@ -994,7 +994,7 @@ public class AlohAndesTransactionManager {
 		}
 	}
 	
-	public List<Alojamiento> getAlojamientosFiltrados(Date fecha1, Date fecha2, ArrayList<String> servicios) throws Exception {
+	public List<Alojamiento> getAlojamientosFiltrados(Date fecha1, Date fecha2, List<String> servicios) throws Exception {
 		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
 		List<Alojamiento> alojamientos;
 		try 

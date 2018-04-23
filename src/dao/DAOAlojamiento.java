@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import vos.*;
 public class DAOAlojamiento {
@@ -163,8 +164,8 @@ public class DAOAlojamiento {
 		prepStmt.executeQuery();
 	}
 	
-	public ArrayList<Alojamiento> getAlojamientosFiltrados(Date fecha1, Date fecha2, ArrayList<String> servicios) throws SQLException, Exception {
-		ArrayList<Alojamiento> AlojamientosF = new ArrayList<Alojamiento>();
+	public List<Alojamiento> getAlojamientosFiltrados(Date fecha1, Date fecha2, List<String> servicios) throws SQLException, Exception {
+		List<Alojamiento> AlojamientosF = new ArrayList<Alojamiento>();
 		
 		// El %1$s es USUARIO, el %2$s es servicios.size(), el %3$s es fecha1 y el %4$s es fecha2
 		String presql = "(SELECT CAPACIDAD, IDALOJAMIENTO, UBICACION, TAMAÑO, HABILITADO, FECHA_APERTURA " + 
