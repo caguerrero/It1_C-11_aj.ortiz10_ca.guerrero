@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import vos.*;
 
@@ -162,6 +163,39 @@ public class DAOReserva {
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
+	}
+	
+	public void registrarReservaMasiva(Reserva reservaParam, String tipoAlojamiento, int cantidadAlojamientos) throws SQLException, Exception {
+		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
+		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento();
+		Long numReservas = (long) getReservas().size();
+		int numAlojamientos = daoAlojamiento.getAlojamientos().size();
+		int numAlojamientosDisponibles = numAlojamientos - daoReservasDeAlojamiento.getAllReservassDeAlojamiento().size();
+		if(numAlojamientosDisponibles < )
+		while(i < cantidadAlojamientos)
+		{
+			Reserva reserva = new Reserva(reservaParam.getFechaReserva(), reservaParam.getFinEstadia(), numReservas + i, reservaParam.getInicioEstadia(), reservaParam.getPrecio(), reservaParam.getIdCliente(), 0);
+			
+			ReservasDeAlojamiento ra = new ReservasDeAlojamiento(numReservas + i, idAlojamiento);
+			if (tipoAlojamiento.equals("apartamento") ) {
+				reservasdeal.addReservasDeAlojamiento(a);
+				DAOApartamento ap = new DAOApartamento();
+				ap.findApartamentoById(id);
+				Apartamento apa = new Apartamento(idApartamento, menaje, numHabitaciones)
+			}
+			else if(tipoAlojamiento.equals("habitacion")) {
+				reservasdeal.addReservasDeAlojamiento(a);
+				DAOHabitacion hab = new DAOHabitacion();
+				hab.findHabitacionById(id);
+				Habitacion h = new Habitacion(idHabitacion, categoria, compartido, tipo)
+			}
+			else {
+				throw new Exception("Debe ingresar un tipo de alojamiento valido: apartamento o habitacion.");
+			}
+			
+			addReserva(reserva);
+			i++;
+		}
 	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------

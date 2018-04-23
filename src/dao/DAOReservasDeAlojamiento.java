@@ -95,6 +95,23 @@ public class DAOReservasDeAlojamiento {
 
 			return ReservasDeAlojamiento;
 		}
+		
+		public ReservasDeAlojamiento findReservasDeAlojamientoByIdAlojamiento(Long idAlojamiento) throws SQLException, Exception 
+		{
+			ReservasDeAlojamiento ReservasDeAlojamiento = null;
+
+			String sql = String.format("SELECT DISTINCT FROM %1$s.RESERVASDEALOJAMIENTO WHERE IDALOJAMIENTO = %2$d", USUARIO, idAlojamiento); 
+
+			PreparedStatement prepStmt = conn.prepareStatement(sql);
+			recursos.add(prepStmt);
+			ResultSet rs = prepStmt.executeQuery();
+
+			if(rs.next()) {
+				ReservasDeAlojamiento = convertResultSetToReservasDeAlojamiento(rs);
+			}
+
+			return ReservasDeAlojamiento;
+		}
 
 		/**
 		 * Metodo que agregar la informacion de un nuevo ReservasDeAlojamiento en la Base de Datos a partir del parametro ingresado<br/>
