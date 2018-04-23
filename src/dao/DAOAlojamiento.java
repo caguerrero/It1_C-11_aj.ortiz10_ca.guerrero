@@ -162,6 +162,42 @@ public class DAOAlojamiento {
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
 	}
+	
+	public ArrayList<Alojamiento> getAlojamientosFiltrados(Date fecha1, Date fecha2, ArrayList<String> servicios) throws SQLException, Exception {
+		ArrayList<Alojamiento> AlojamientosF = new ArrayList<Alojamiento>();
+		
+		// El %1$s es USUARIO, el %2$s es servicios.size(), el %3$s es fecha1 y el %4$s es fecha2
+		String presql = "(SELECT CAPACIDAD, IDALOJAMIENTO, UBICACION, TAMAÑO, HABILITADO, FECHA_APERTURA " + 
+		        " FROM(SELECT DISTINCT S.NOMBRE, A.CAPACIDAD, A.IDALOJAMIENTO, A.UBICACION, A.TAMAÑO, A.HABILITADO, A.FECHA_APERTURA " +
+				" FROM %1$s.SERVICIOSDEALOJAMIENTO SA INNER JOIN %1$s.SERVICIOS S ON SA.IDSERVICIO = S.IDSERVICIO " +
+				" INNER JOIN %1$s.ALOJAMIENTO A ON A.IDALOJAMIENTO = SA.IDALOJAMIENTO " + 
+				" WHERE S.NOMBRE = ";
+		
+		for(int i = 0; i < servicios.size(); i++)
+		{
+			if(i == 0) {
+				presql = presql + " " + "'" + servicios.get(0) + "'";
+			}
+			else {
+				presql += " OR S.NOMBRE = " + "'" + servicios.get(i) + "'";
+			}
+		}
+		presql = presql + ") GROUP BY IDALOJAMIENTO, CAPACIDAD, UBICACION, TAMAÑO, HABILITADO, FECHA_APERTURA " +
+		        " HAVING COUNT(IDALOJAMIENTO)>= %2$s)"+ "MINUS (SELECT A.CAPACIDAD, A.IDALOJAMIENTO, A.UBICACION, A.TAMAÑO, A.HABILITADO, A.FECHA_APERTURA " + 
+				" FROM RESERVA R INNER JOIN RESERVASDEALOJAMIENTO RA ON R.IDRESERVA = RA.IDRESERVA " + 
+				" INNER JOIN ALOJAMIENTO A ON A.IDALOJAMIENTO = RA.IDALOJAMIENTO " + 
+				" WHERE ((TO_DATE('%3$s', 'DD/MM/YY') <= INICIOESTADIA AND TO_DATE('%3$s', 'DD/MM/YY') <= FINESTADIA) AND (TO_DATE('%4$s', 'DD/MM/YY') >= INICIOESTADIA AND TO_DATE('%4$s', 'DD/MM/YY') >= FINESTADIA)) " + 
+				" OR (TO_DATE('%3$s', 'DD/MM/YY') >= INICIOESTADIA AND TO_DATE('%3$s', 'DD/MM/YY') <= FINESTADIA) OR (TO_DATE('%4$s', 'DD/MM/YY') <= FINESTADIA AND TO_DATE('%4$s', 'DD/MM/YY') >= INICIOESTADIA))";
+		String sql = String.format(presql, USUARIO, servicios.size(), fecha1, fecha2);
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			AlojamientosF.add(convertResultSetToAlojamiento(rs));
+		}
+		return AlojamientosF;
+	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// METODOS AUXILIARES

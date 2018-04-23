@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -990,6 +992,49 @@ public class AlohAndesTransactionManager {
 				throw exception;
 			}
 		}
+	}
+	
+	public List<Alojamiento> getAlojamientosFiltrados(Date fecha1, Date fecha2, ArrayList<String> servicios) throws Exception {
+		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
+		List<Alojamiento> alojamientos;
+		try 
+		{
+			this.conn = darConexion();
+			daoAlojamiento.setConn(conn);
+			if(servicios.isEmpty())
+			{
+				throw new Exception("Debe proporcionar al menos un servicio que desee que tengan los alojamientos.");
+			}
+			if(fecha1 == null || fecha2 == null)
+			{
+				throw new Exception("Debe proporcionar las fechas entre las que quiere que esten disponibles los alojamientos.");
+			}
+			alojamientos = daoAlojamiento.getAlojamientosFiltrados(fecha1, fecha1, servicios);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return alojamientos;
 	}
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// TRANSACCIONES DE LA TABLA OPERADORES

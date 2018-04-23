@@ -59,7 +59,7 @@ public class AlojamientoService {
 	 */			
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getAlojamientoes() {
+	public Response getAlojamientos() {
 
 		try {
 			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
@@ -166,6 +166,22 @@ public class AlojamientoService {
 		catch( Exception e )
 		{
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getAlojamientosFiltrados() {
+
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
+
+			List<Alojamiento> ofertasAlojamiento;
+			ofertasAlojamiento = tm.getAllAlojamiento();
+			return Response.status(200).entity(ofertasAlojamiento).build();
+		} 
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
 		}
 	}
 }
