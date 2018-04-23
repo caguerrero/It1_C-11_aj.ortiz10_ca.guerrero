@@ -1,6 +1,5 @@
 package dao;
 
-
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -164,7 +163,7 @@ public class DAOAlojamiento {
 		prepStmt.executeQuery();
 	}
 	
-	public List<Alojamiento> getAlojamientosFiltrados(Date fecha1, Date fecha2, List<String> servicios) throws SQLException, Exception {
+	public List<Alojamiento> getAlojamientosFiltrados(String fecha1, String fecha2, List<String> servicios) throws SQLException, Exception {
 		List<Alojamiento> AlojamientosF = new ArrayList<Alojamiento>();
 		
 		// El %1$s es USUARIO, el %2$s es servicios.size(), el %3$s es fecha1 y el %4$s es fecha2

@@ -1,6 +1,5 @@
 package rest;
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -176,11 +175,14 @@ public class AlojamientoService {
 	@GET
 	@Path( "filtrar" )
 	@Produces( { MediaType.APPLICATION_JSON } )
-	public Response getAlojamientosFiltrados(@QueryParam( "fecha1" ) Date fecha1, @QueryParam( "fecha2" ) Date fecha2, @QueryParam( "servicios" ) String servicios) {
+	public Response getAlojamientosFiltrados(@QueryParam( "fecha1" ) String fecha1, @QueryParam( "fecha2" ) String fecha2, @QueryParam( "servicios" ) String servicios) {
 		
 		try {
 			AlohAndesTransactionManager tm = new AlohAndesTransactionManager( getPath() );
-			System.out.println("ENTRA");
+			
+			fecha1 = fecha1.replace("-", "/");
+			fecha2 = fecha2.replace("-", "/");
+			
 			String[] servicios1 = servicios.split(" ");
 			List<String> servicios2 = new ArrayList<String>();
 			int i = 0;
