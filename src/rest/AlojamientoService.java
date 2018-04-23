@@ -1,5 +1,7 @@
 package rest;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -11,12 +13,14 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import tm.AlohAndesTransactionManager;
 import vos.Alojamiento;
+import vos.RequestBody;
 
 @Path("alojamientos")
 public class AlojamientoService {
@@ -170,14 +174,15 @@ public class AlojamientoService {
 	}
 	
 	@GET
+	@Path( "/filtrar" )
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getAlojamientosFiltrados() {
+	public Response getAlojamientosFiltrados(@QueryParam( "fecha1" ) Date fecha1, @QueryParam( "fecha2" ) Date fecha2, @QueryParam( "servicios" ) ArrayList<String> servicios) {
 
 		try {
 			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
 
 			List<Alojamiento> ofertasAlojamiento;
-			ofertasAlojamiento = tm.getAllAlojamiento();
+			ofertasAlojamiento = tm.getAlojamientosFiltrados(fecha1, fecha2, servicios);
 			return Response.status(200).entity(ofertasAlojamiento).build();
 		} 
 		catch (Exception e) {
