@@ -199,6 +199,25 @@ public class DAOAlojamiento {
 		}
 		return AlojamientosF;
 	}
+	
+	public ArrayList<Ocupacion> getOcupacionAlojamientos() throws SQLException, Exception {
+		ArrayList<Ocupacion> Alojamientos = new ArrayList<Ocupacion>();
+
+		String sql = String.format("SELECT IDALOJAMIENTO, ROUND(Total_Reservado/Total,5) as Indice_De_Ocupacion " + 
+				"FROM (SELECT IDALOJAMIENTO, COALESCE(SUM(FINESTADIA-INICIOESTADIA),0) as Total_Reservado " + 
+				"FROM %1$s.RESERVA NATURAL RIGHT JOIN %1$s.RESERVASDEALOJAMIENTO NATURAL RIGHT JOIN %1$s.ALOJAMIENTO " + 
+				"WHERE SYSDATE>=FINESTADIA OR FINESTADIA IS NULL GROUP BY IDALOJAMIENTO) NATURAL JOIN " + 
+				"(SELECT IDALOJAMIENTO, SYSDATE - FECHA_APERTURA as Total FROM %1$s.ALOJAMIENTO) ORDER BY IDALOJAMIENTO", USUARIO);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			Alojamientos.add(convertResultSetToOcupacion(rs));
+		}
+		return Alojamientos;
+	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// METODOS AUXILIARES
@@ -243,5 +262,11 @@ public class DAOAlojamiento {
 		Date fecha_apertura = resultSet.getDate("FECHA_APERTURA");
 		Alojamiento ofAlojamiento = new Alojamiento(capacidad, idAlojamiento, tamaño, ubicacion, habilitado, fecha_apertura);
 		return ofAlojamiento;
+	}
+	private Ocupacion convertResultSetToOcupacion(ResultSet rs) throws SQLException{
+		Long idAlojamiento = rs.getLong("IDALOJAMIENTO");
+		double indice_de_ocupacion = rs.getDouble("INDICE_DE_OCUPACION");
+		Ocupacion alojamiento = new Ocupacion(idAlojamiento, indice_de_ocupacion);
+		return alojamiento;
 	}
 }

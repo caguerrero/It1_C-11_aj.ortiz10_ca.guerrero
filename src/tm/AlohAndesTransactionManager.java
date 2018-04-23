@@ -25,6 +25,7 @@ import dao.DAOServicioDeAlojamiento;
 import vos.Apartamento;
 import vos.Cliente;
 import vos.Habitacion;
+import vos.Ocupacion;
 import vos.Oferta;
 import vos.Alojamiento;
 import vos.AlojamientosDeOferta;
@@ -1035,6 +1036,41 @@ public class AlohAndesTransactionManager {
 			}
 		}
 		return alojamientos;
+	}
+	
+	public List<Ocupacion> getOcupacionAlojamientos() throws Exception {
+		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
+		List<Ocupacion> ocupacionAlojamientos;
+		try 
+		{
+			this.conn = darConexion();
+			daoAlojamiento.setConn(conn);
+			ocupacionAlojamientos = daoAlojamiento.getOcupacionAlojamientos();
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+		return ocupacionAlojamientos;
 	}
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// TRANSACCIONES DE LA TABLA OPERADORES

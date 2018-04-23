@@ -20,7 +20,7 @@ import javax.ws.rs.core.Response;
 
 import tm.AlohAndesTransactionManager;
 import vos.Alojamiento;
-import vos.RequestBody;
+import vos.Ocupacion;
 
 @Path("alojamientos")
 public class AlojamientoService {
@@ -197,4 +197,21 @@ public class AlojamientoService {
 			return Response.status(500).entity(doErrorMessage(e)).build();
 		}
 	}
+	
+	@GET
+	@Path( "indiceOcupacion" )
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getOcupacionAlojamientos() {
+		
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager( getPath() );
+			List<Ocupacion> ocupaciones;
+			ocupaciones = tm.getOcupacionAlojamientos();
+			return Response.status(200).entity(ocupaciones).build();
+		} 
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
+		}
+	}
+	
 }
