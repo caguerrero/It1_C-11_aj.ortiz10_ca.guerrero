@@ -27,6 +27,7 @@ import vos.Cliente;
 import vos.Habitacion;
 import vos.Ocupacion;
 import vos.Oferta;
+import vos.Operacion;
 import vos.Alojamiento;
 import vos.AlojamientosDeOferta;
 import vos.Operador;
@@ -2840,7 +2841,7 @@ public class AlohAndesTransactionManager {
 			usos = daoUsos.getUsoComunidad();
 			if(usos.isEmpty())
 			{
-				throw new Exception("No se ha usado nunca AloHandes.");				
+				throw new Exception("No se ha usado nunca AlohAndes.");				
 			}
 		} 
 		catch (SQLException sqlException) {
@@ -2954,5 +2955,43 @@ public class AlohAndesTransactionManager {
 			}
 		}
 		return usos;
+	}
+	
+	public List<Operacion> getOperacionAloHandes( ) throws Exception {
+		DAOUsos daoUsos = new DAOUsos();
+		List<Operacion> operaciones = null;
+		try
+		{
+			this.conn = darConexion();
+			daoUsos.setConn(conn);
+			operaciones = daoUsos.getOperacionAlohAndes();
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			conn.rollback();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			conn.rollback();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoUsos.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				conn.rollback();
+				throw exception;
+			}
+		}
+		return operaciones;
 	}
 }
