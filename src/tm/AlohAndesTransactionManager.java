@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -1015,11 +1014,13 @@ public class AlohAndesTransactionManager {
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1032,6 +1033,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}
@@ -1046,15 +1048,18 @@ public class AlohAndesTransactionManager {
 			this.conn = darConexion();
 			daoAlojamiento.setConn(conn);
 			ocupacionAlojamientos = daoAlojamiento.getOcupacionAlojamientos();
+			conn.commit();
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1067,6 +1072,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}
@@ -1088,16 +1094,19 @@ public class AlohAndesTransactionManager {
 		{
 			this.conn = darConexion();
 			daoOperador.setConn(conn);
+			conn.commit();
 			operadores = daoOperador.getOperadores();
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1110,6 +1119,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}
@@ -1130,6 +1140,7 @@ public class AlohAndesTransactionManager {
 			this.conn = darConexion();
 			daoOperador.setConn(conn);
 			operador = daoOperador.findOperadorByCedulaNIT(id);
+			conn.commit();
 			if(operador == null)
 			{
 				throw new Exception("El operador con el id = " + id + " no se encuentra persistido en la base de datos.");				
@@ -1138,11 +1149,13 @@ public class AlohAndesTransactionManager {
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1155,6 +1168,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}
@@ -1176,15 +1190,18 @@ public class AlohAndesTransactionManager {
 			this.conn = darConexion();
 			daoOperador.setConn(conn);
 			daoOperador.addOperador(operador);
+			conn.commit();
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1197,6 +1214,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}
@@ -1218,19 +1236,24 @@ public class AlohAndesTransactionManager {
 		{
 			this.conn = darConexion();
 			daoOperador.setConn( conn );
-			if(daoOperador.findOperadorByCedulaNIT(operador.getCedula_NIT()) !=null)
-			{daoOperador.updateOperador(operador);}
-			else
-			{throw new Exception("El operador con el ID " + operador.getCedula_NIT() + " no se encuentra en la base de datos");}
+			if(daoOperador.findOperadorByCedulaNIT(operador.getCedula_NIT()) !=null) {
+				daoOperador.updateOperador(operador);
+				conn.commit();
+			}
+			else {
+				throw new Exception("El operador con el ID " + operador.getCedula_NIT() + " no se encuentra en la base de datos");
+			}
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1243,6 +1266,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}	
@@ -1261,19 +1285,25 @@ public class AlohAndesTransactionManager {
 		{
 			this.conn = darConexion();
 			daoOperador.setConn( conn );
-			if(daoOperador.findOperadorByCedulaNIT(operador.getCedula_NIT()) != null)
-			{daoOperador.deleteOperador(operador);}
+			if(daoOperador.findOperadorByCedulaNIT(operador.getCedula_NIT()) != null) {
+				daoOperador.deleteOperador(operador);
+				conn.commit();
+			}
 			else
-			{throw new Exception("El operador con ID " + operador.getCedula_NIT() + " no se encuentra en la base de datos");}
+			{
+				throw new Exception("El operador con ID " + operador.getCedula_NIT() + " no se encuentra en la base de datos");
+				}
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1286,6 +1316,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}	
@@ -1349,6 +1380,7 @@ public class AlohAndesTransactionManager {
 			this.conn = darConexion();
 			daoReserva.setConn(conn);
 			reserva = daoReserva.findReservaById(id);
+			conn.commit();
 			if(reserva == null)
 			{
 				throw new Exception("El reserva con el id = " + id + " no se encuentra persistido en la base de datos.");				
@@ -1357,11 +1389,13 @@ public class AlohAndesTransactionManager {
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1374,6 +1408,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}
@@ -1396,6 +1431,8 @@ public class AlohAndesTransactionManager {
 		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento();
 		try
 		{
+			// Cambia el nivel de serializacion a SERIALIZABLE.
+			
 			this.conn = darConexion();
 			daoReserva.setConn(conn);
 			daoAlojamiento.setConn(conn);
@@ -1424,9 +1461,10 @@ public class AlohAndesTransactionManager {
 						daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
 						
 						i++;
+						conn.commit();
 					}
 				}
-				else if(tipoAlojamiento.equals("habitacion") && numHabitacionesDisponibles >= cantidadAlojamientos) {
+			    if(tipoAlojamiento.equals("habitacion") && numHabitacionesDisponibles >= cantidadAlojamientos) {
 					int i = 1;
 					while(i <= cantidadAlojamientos) {
 						Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), numReservas + i, reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
@@ -1437,16 +1475,20 @@ public class AlohAndesTransactionManager {
 						daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
 						
 						i++;
+						conn.commit();
 					}
 				}
 				else {
 					if(numApartamentosDisponibles < cantidadAlojamientos) {
+						conn.rollback();
 						throw new Exception("No hay suficientes alojamientos disponibles del tipo apartamento realizar la reserva" + "hay " + numApartamentosDisponibles + " habitaciones disponibles.");
 					}
-					else if(numHabitacionesDisponibles < cantidadAlojamientos){
+					else if(numHabitacionesDisponibles < cantidadAlojamientos) {
+						conn.rollback();
 						throw new Exception("No hay suficientes alojamientos disponibles del tipo habitacion realizar la reserva " + "hay " + numHabitacionesDisponibles + " habitaciones disponibles.");
 					}
 					else {
+						conn.rollback();
 						throw new Exception("Debe ingresar un tipo de alojamiento valido: apartamento o habitacion. Usted ingreso " + tipoAlojamiento);
 					}
 					
@@ -1456,13 +1498,15 @@ public class AlohAndesTransactionManager {
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
-		} 
+		}
 		finally {
 			try {
 				daoReserva.cerrarRecursos();
@@ -1473,6 +1517,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}
@@ -1482,20 +1527,22 @@ public class AlohAndesTransactionManager {
 	{
 
 		DAOReserva daoReserva = new DAOReserva( );
-		try
-		{
+		try {
 			this.conn = darConexion();
 			daoReserva.setConn(conn);
 			daoReserva.addReserva(reserva);
+			conn.commit();
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1508,6 +1555,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}
@@ -1527,19 +1575,24 @@ public class AlohAndesTransactionManager {
 		{
 			this.conn = darConexion();
 			daoReserva.setConn( conn );
-			if(daoReserva.findReservaById(reserva.getIdReserva()) !=null)
-			{daoReserva.updateReserva(reserva);}
-			else
-			{throw new Exception("La reserva con el ID " + reserva.getIdReserva() + " no se encuentra en la base de datos");}
+			if(daoReserva.findReservaById(reserva.getIdReserva()) !=null) {
+				daoReserva.updateReserva(reserva);
+				conn.commit();
+			}
+			else {
+				throw new Exception("La reserva con el ID " + reserva.getIdReserva() + " no se encuentra en la base de datos");
+			}
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1552,6 +1605,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}	
@@ -1570,19 +1624,25 @@ public class AlohAndesTransactionManager {
 		{
 			this.conn = darConexion();
 			daoReserva.setConn( conn );
-			if(daoReserva.findReservaById(reserva.getIdReserva()) != null)
-			{daoReserva.deleteReserva(reserva);}
+			if(daoReserva.findReservaById(reserva.getIdReserva()) != null) {
+				daoReserva.deleteReserva(reserva);
+				conn.commit();
+			}
 			else
-			{throw new Exception("La reserva con ID " + reserva.getIdReserva() + " no se encuentra en la base de datos");}
+			{
+				throw new Exception("La reserva con ID " + reserva.getIdReserva() + " no se encuentra en la base de datos");
+			}
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
 			sqlException.printStackTrace();
+			conn.rollback();
 			throw sqlException;
 		} 
 		catch (Exception exception) {
 			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
 			exception.printStackTrace();
+			conn.rollback();
 			throw exception;
 		} 
 		finally {
@@ -1595,6 +1655,7 @@ public class AlohAndesTransactionManager {
 			catch (SQLException exception) {
 				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
 				exception.printStackTrace();
+				conn.rollback();
 				throw exception;
 			}
 		}	

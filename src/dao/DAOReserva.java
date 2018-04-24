@@ -165,56 +165,6 @@ public class DAOReserva {
 		prepStmt.executeQuery();
 	}
 
-	public void registrarReservaMasiva(Reserva reservaParam, String tipoAlojamiento, int cantidadAlojamientos) throws SQLException, Exception {
-		
-		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
-		DAOApartamento daoApartamento = new DAOApartamento();
-		DAOHabitacion daoHabitacion = new DAOHabitacion();
-		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento();
-		Long numReservas = (long) getReservas().size();
-		int numAlojamientosDisponibles = daoAlojamiento.getAlojamientosDisponibles().size();
-		Long numHabitacionesDisponibles = (long) daoHabitacion.getHabitacionesDisponibles().size();
-		Long numApartamentosDisponibles = (long) daoApartamento.getApartamentosDisponibles().size();
-		ArrayList<Apartamento> apartamentosDisponibles = daoApartamento.getApartamentosDisponibles();
-		ArrayList<Habitacion> habitacionesDisponibles = daoHabitacion.getHabitacionesDisponibles();
-
-		if(numAlojamientosDisponibles >= cantidadAlojamientos)
-		{
-			if (tipoAlojamiento.equals("apartamento") && numApartamentosDisponibles >= cantidadAlojamientos) {
-				int i = 0;
-				while(i < cantidadAlojamientos) {
-					ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, apartamentosDisponibles.get(i).getIdApartamento());
-					daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
-					Reserva res = new Reserva(reservaParam.getFechaReserva(), reservaParam.getFinEstadia(), reservaParam.getIdReserva(), reservaParam.getInicioEstadia(), reservaParam.getPrecio(), reservaParam.getIdCliente(), 0);
-					addReserva(res);
-					i++;
-				}
-			}
-			else if(tipoAlojamiento.equals("habitacion") && numHabitacionesDisponibles >= cantidadAlojamientos) {
-				int i = 0;
-				while(i < cantidadAlojamientos) {
-					ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, habitacionesDisponibles.get(i).getIdHabitacion());
-					daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
-					Reserva res = new Reserva(reservaParam.getFechaReserva(), reservaParam.getFinEstadia(), reservaParam.getIdReserva(), reservaParam.getInicioEstadia(), reservaParam.getPrecio(), reservaParam.getIdCliente(), 0);
-					addReserva(res);
-					i++;
-				}
-			}
-			else {
-				if(numApartamentosDisponibles < cantidadAlojamientos) {
-					throw new Exception("No hay suficientes alojamientos disponibles del tipo apartamento realizar la reserva" + "hay " + numApartamentosDisponibles + " habitaciones disponibles.");
-				}
-				else if(numHabitacionesDisponibles < cantidadAlojamientos){
-					throw new Exception("No hay suficientes alojamientos disponibles del tipo habitacion realizar la reserva " + "hay " + numHabitacionesDisponibles + " habitaciones disponibles.");
-				}
-				else {
-					throw new Exception("Debe ingresar un tipo de alojamiento valido: apartamento o habitacion. Usted ingreso " + tipoAlojamiento);
-				}
-				
-			}
-		}
-	}
-
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// METODOS AUXILIARES
 	//----------------------------------------------------------------------------------------------------------------------------------
