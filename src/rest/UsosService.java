@@ -101,13 +101,13 @@ public class UsosService {
 	@GET
 	@Path("operacionAlohAndes")
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getOperacionAlohAndes() {
+	public Response getOperacionAlohAndes(@QueryParam( "fecha1" ) String fecha1, @QueryParam( "fecha2" ) String fecha2) {
 
 		try {
 			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
 
 			List<Operacion> operaciones;
-			operaciones = tm.getOperacionAloHandes();
+			operaciones = tm.getOperacionAloHandes(fecha1, fecha2);
 			return Response.status(200).entity(operaciones).build();
 		} 
 		catch (Exception e) {

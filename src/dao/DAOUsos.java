@@ -142,62 +142,55 @@ public class DAOUsos {
 		return usosCliente;
 	}
 
-	public ArrayList<Operacion> getOperacionAlohAndes( ) throws SQLException, Exception {
+	public ArrayList<Operacion> getOperacionAlohAndes(String fecha1, String fecha2 ) throws SQLException, Exception {
 		ArrayList<Operacion> operaciones = new ArrayList<Operacion>();
 
 		String sql = String.format("SELECT FECHAS, CARACTERISTICA FROM " + 
-				"(SELECT FECHAS, 'MAYOR DEMANDA' AS CARACTERISTICA " + 
-				"FROM " + 
-				"(SELECT FECHAS, COUNT(FINESTADIA) AS VECES " + 
-				"FROM LISTAFECHAS " + 
-				"CROSS JOIN RESERVA " + 
-				"WHERE FECHAS BETWEEN TO_DATE('01-01-2017','DD-MM-YYYY') AND TO_DATE('01-01-2019','DD-MM-YYYY') AND  " + 
-				"FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA   " + 
-				"GROUP BY FECHAS " + 
-				"HAVING COUNT(FINESTADIA)=(SELECT MAX(VECES) " + 
-				"                            FROM " + 
-				"                            (SELECT FECHAS, COUNT(FINESTADIA) AS VECES " + 
-				"                            FROM LISTAFECHAS " + 
-				"                            CROSS JOIN RESERVA " + 
-				"                            WHERE FECHAS BETWEEN TO_DATE('01-01-2017','DD-MM-YYYY') AND TO_DATE('01-01-2019','DD-MM-YYYY') AND  " + 
-				"                            FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA " + 
-				"                            GROUP BY FECHAS)))) " + 
-				"UNION " + 
-				"SELECT FECHAS, CARACTERISTICA FROM " + 
-				"(SELECT FECHAS, 'MAYOR INGRESO' AS CARACTERISTICA " + 
-				"FROM " + 
-				"(SELECT FECHAS, SUM(PRECIO) AS INGRESO " + 
-				"FROM LISTAFECHAS " + 
-				"CROSS JOIN RESERVA " + 
-				"WHERE FECHAS BETWEEN TO_DATE('01-01-2017','DD-MM-YYYY') AND TO_DATE('01-01-2019','DD-MM-YYYY') AND  " + 
-				"FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA   " + 
-				"GROUP BY FECHAS " + 
-				"HAVING SUM(PRECIO)=(SELECT MAX(INGRESO) " + 
-				"                            FROM " + 
-				"                            (SELECT FECHAS, SUM(PRECIO) AS INGRESO " + 
-				"                            FROM LISTAFECHAS " + 
-				"                            CROSS JOIN RESERVA " + 
-				"                            WHERE FECHAS BETWEEN TO_DATE('01-01-2017','DD-MM-YYYY') AND TO_DATE('01-01-2019','DD-MM-YYYY') AND  " + 
-				"                            FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA " + 
-				"                            GROUP BY FECHAS)))) " + 
-				"UNION " + 
-				"SELECT FECHAS, CARACTERISTICA FROM " + 
-				"(SELECT FECHAS, 'MENOR DEMANDA' AS CARACTERISTICA " + 
-				"FROM " + 
-				"(SELECT FECHAS, COUNT(FINESTADIA) AS VECES " + 
-				"FROM LISTAFECHAS " + 
-				"CROSS JOIN RESERVA " + 
-				"WHERE FECHAS BETWEEN TO_DATE('01-01-2017','DD-MM-YYYY') AND TO_DATE('01-01-2019','DD-MM-YYYY') AND  " + 
-				"FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA   " + 
-				"GROUP BY FECHAS " + 
-				"HAVING COUNT(FINESTADIA)=(SELECT MIN(VECES) " + 
-				"                            FROM " + 
-				"                            (SELECT FECHAS, COUNT(FINESTADIA) AS VECES " + 
-				"                            FROM LISTAFECHAS " + 
-				"                            CROSS JOIN RESERVA " + 
-				"                            WHERE FECHAS BETWEEN TO_DATE('01-01-2017','DD-MM-YYYY') AND TO_DATE('01-01-2019','DD-MM-YYYY') AND  " + 
-				"                            FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA " + 
-				"                            GROUP BY FECHAS)))) ORDER BY CARACTERISTICA", USUARIO);
+				"				(SELECT FECHAS, 'MAYOR DEMANDA' AS CARACTERISTICA  " + 
+				"				FROM  " + 
+				"				(SELECT FECHAS, COUNT(FINESTADIA) AS VECES  " + 
+				"				FROM %1$s.LISTAFECHAS  " + 
+				"				CROSS JOIN %1$s.RESERVA   " + 
+				"                WHERE FECHAS BETWEEN TO_DATE('%2$s','DD-MM-YYYY') AND TO_DATE('%3$s','DD-MM-YYYY') AND   " + 
+				"				FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA    " + 
+				"				GROUP BY FECHAS  " + 
+				"				HAVING COUNT(FINESTADIA)=(SELECT MAX(VECES)  " + 
+				"				                            FROM   " + 
+				"				                            (SELECT FECHAS, COUNT(FINESTADIA) AS VECES  " + 
+				"				                            FROM %1$s.LISTAFECHAS  " + 
+				"				                            CROSS JOIN RESERVA   " + 
+				"				                            WHERE FECHAS BETWEEN TO_DATE('%2$s','DD-MM-YYYY') AND TO_DATE('%3$s','DD-MM-YYYY') AND  " + 
+				"				                            FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA   " + 
+				"				                            GROUP BY FECHAS))))   " + 
+				"				UNION   " + 
+				"				SELECT FECHAS, CARACTERISTICA FROM (SELECT FECHAS, 'MAYOR INGRESO' AS CARACTERISTICA  " + 
+				"				FROM (SELECT FECHAS, SUM(PRECIO) AS INGRESO " + 
+				"				FROM %1$s.LISTAFECHAS  " + 
+				"				CROSS JOIN %1$s.RESERVA   " + 
+				"				WHERE FECHAS BETWEEN TO_DATE('%2$s','DD-MM-YYYY') AND TO_DATE('%3$s','DD-MM-YYYY') AND   " + 
+				"				FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA  " + 
+				"				GROUP BY FECHAS  " + 
+				"				HAVING SUM(PRECIO)=(SELECT MAX(INGRESO)  " + 
+				"				                            FROM  " + 
+				"				                            (SELECT FECHAS, SUM(PRECIO) AS INGRESO   " + 
+				"				                            FROM %1$s.LISTAFECHAS   " + 
+				"				                            CROSS JOIN %1$s.RESERVA   " + 
+				"				                            WHERE FECHAS BETWEEN TO_DATE('%2$s','DD-MM-YYYY') AND TO_DATE('%3$s','DD-MM-YYYY') AND   " + 
+				"				                            FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA " + 
+				"				                            GROUP BY FECHAS))))   " + 
+				"				UNION  " + 
+				"				SELECT FECHAS, CARACTERISTICA FROM (SELECT FECHAS, 'MENOR DEMANDA' AS CARACTERISTICA  " + 
+				"				FROM (SELECT FECHAS, COUNT(FINESTADIA) AS VECES  " + 
+				"				FROM %1$s.LISTAFECHAS   " + 
+				"				CROSS JOIN %1$s.RESERVA   " + 
+				"				WHERE FECHAS BETWEEN TO_DATE('%2$s','DD-MM-YYYY') AND TO_DATE('%3$s','DD-MM-YYYY') AND   " + 
+				"				FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA   " + 
+				"				GROUP BY FECHAS  " + 
+				"				HAVING COUNT(FINESTADIA)=(SELECT MIN(VECES) FROM (SELECT FECHAS, COUNT(FINESTADIA) AS VECES  " + 
+				"				                            FROM %1$s.LISTAFECHAS CROSS JOIN %1$s.RESERVA  " + 
+				"				                            WHERE FECHAS BETWEEN TO_DATE('%2$s','DD-MM-YYYY') AND TO_DATE('%3$s','DD-MM-YYYY') AND   " + 
+				"				                            FECHAS>=INICIOESTADIA AND FECHAS<=FINESTADIA  " + 
+				"				                            GROUP BY FECHAS)))) ORDER BY CARACTERISTICA", USUARIO, fecha1, fecha2);
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
@@ -274,7 +267,7 @@ public class DAOUsos {
 
 	private Operacion convertResultSetToOperacion(ResultSet resultSet) throws SQLException {
 		Date fechas = resultSet.getDate("FECHAS");
-		String caracteristicas = resultSet.getString("CARACTERISTICAS");
+		String caracteristicas = resultSet.getString("CARACTERISTICA");
 
 		Operacion uso = new Operacion(fechas, caracteristicas);
 

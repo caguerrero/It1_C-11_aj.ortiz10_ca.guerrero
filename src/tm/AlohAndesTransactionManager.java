@@ -1467,14 +1467,14 @@ public class AlohAndesTransactionManager {
 	public void registrarReservaMasiva(Reserva reserva, String tipoAlojamiento, int cantidadAlojamientos) throws Exception 
 	{
 
-		DAOReserva daoReserva = new DAOReserva( );
+		
+		DAOReserva daoReserva = new DAOReserva();
 		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
 		DAOApartamento daoApartamento = new DAOApartamento();
 		DAOHabitacion daoHabitacion = new DAOHabitacion();
 		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento();
 		try
 		{
-			// Cambia el nivel de serializacion a SERIALIZABLE.
 			
 			this.conn = darConexion();
 			daoReserva.setConn(conn);
@@ -1564,6 +1564,7 @@ public class AlohAndesTransactionManager {
 				throw exception;
 			}
 		}
+		
 	}
 
 	public void addReserva(Reserva reserva) throws Exception 
@@ -2957,14 +2958,14 @@ public class AlohAndesTransactionManager {
 		return usos;
 	}
 	
-	public List<Operacion> getOperacionAloHandes( ) throws Exception {
+	public List<Operacion> getOperacionAloHandes(String fecha1, String fecha2) throws Exception {
 		DAOUsos daoUsos = new DAOUsos();
 		List<Operacion> operaciones = null;
 		try
 		{
 			this.conn = darConexion();
 			daoUsos.setConn(conn);
-			operaciones = daoUsos.getOperacionAlohAndes();
+			operaciones = daoUsos.getOperacionAlohAndes(fecha1, fecha2);
 		} 
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
