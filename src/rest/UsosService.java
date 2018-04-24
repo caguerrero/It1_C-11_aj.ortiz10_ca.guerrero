@@ -5,13 +5,17 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import tm.AlohAndesTransactionManager;
 import vos.Usos;
+import vos.UsosCliente;
+import vos.UsosOperador;
 
 @Path("usoComunidad")
 public class UsosService {
@@ -55,6 +59,40 @@ public class UsosService {
 			List<Usos> usos;
 			usos = tm.getUsoComunidad();
 			return Response.status(200).entity(usos).build();
+		} 
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
+		}
+	}
+	
+	@GET
+	@Path("operador" )
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getUsoOperador(@QueryParam( "cedula" ) Long idOperador) {
+
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
+
+			List<UsosOperador> usosOperador;
+			usosOperador = tm.getUsoOperador(idOperador);
+			return Response.status(200).entity(usosOperador).build();
+		} 
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
+		}
+	}
+	
+	@GET
+	@Path("cliente")
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getUsoCliente(@QueryParam( "cedula" ) Long idOperador) {
+
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
+
+			List<UsosCliente> usosCliente;
+			usosCliente = tm.getUsoCliente(idCliente);
+			return Response.status(200).entity(usosCliente).build();
 		} 
 		catch (Exception e) {
 			return Response.status(500).entity(doErrorMessage(e)).build();
