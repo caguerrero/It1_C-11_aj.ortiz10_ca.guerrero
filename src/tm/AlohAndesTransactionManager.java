@@ -1404,6 +1404,7 @@ public class AlohAndesTransactionManager {
 			daoReservasDeAlojamiento.setConn(conn);
 			
 			Long numReservas = (long) daoReserva.getReservas().size();
+			System.out.println(numReservas);
 			int numAlojamientosDisponibles = daoAlojamiento.getAlojamientosDisponibles().size();
 			Long numHabitacionesDisponibles = (long) daoHabitacion.getHabitacionesDisponibles().size();
 			Long numApartamentosDisponibles = (long) daoApartamento.getApartamentosDisponibles().size();
@@ -1413,22 +1414,28 @@ public class AlohAndesTransactionManager {
 			if(numAlojamientosDisponibles >= cantidadAlojamientos)
 			{
 				if (tipoAlojamiento.equals("apartamento") && numApartamentosDisponibles >= cantidadAlojamientos) {
-					int i = 0;
-					while(i < cantidadAlojamientos) {
-						ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, apartamentosDisponibles.get(i).getIdApartamento());
-						daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
-						Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), reserva.getIdReserva(), reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
+					int i = 1;
+					while(i <= cantidadAlojamientos) {
+						Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), numReservas + i, reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
 						daoReserva.addReserva(res);
+						ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, apartamentosDisponibles.get(i).getIdApartamento());
+						System.out.println(resAl.getIdAlojamiento());
+						System.out.println(resAl.getIdReserva());
+						daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
+						
 						i++;
 					}
 				}
 				else if(tipoAlojamiento.equals("habitacion") && numHabitacionesDisponibles >= cantidadAlojamientos) {
-					int i = 0;
-					while(i < cantidadAlojamientos) {
-						ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, habitacionesDisponibles.get(i).getIdHabitacion());
-						daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
-						Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), reserva.getIdReserva(), reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
+					int i = 1;
+					while(i <= cantidadAlojamientos) {
+						Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), numReservas + i, reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
 						daoReserva.addReserva(res);
+						ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, habitacionesDisponibles.get(i).getIdHabitacion());
+						System.out.println(resAl.getIdAlojamiento());
+						System.out.println(resAl.getIdReserva());
+						daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
+						
 						i++;
 					}
 				}
