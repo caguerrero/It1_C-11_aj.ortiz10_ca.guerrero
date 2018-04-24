@@ -21,6 +21,7 @@ import dao.DAOReserva;
 import dao.DAOReservasDeAlojamiento;
 import dao.DAOServicio;
 import dao.DAOServicioDeAlojamiento;
+import dao.DAOUsos;
 import vos.Apartamento;
 import vos.Cliente;
 import vos.Habitacion;
@@ -35,6 +36,7 @@ import vos.Reserva;
 import vos.ReservasDeAlojamiento;
 import vos.Servicio;
 import vos.ServicioDeAlojamiento;
+import vos.Usos;
 
 public class AlohAndesTransactionManager {
 
@@ -2787,4 +2789,47 @@ public class AlohAndesTransactionManager {
 			}
 		}	
 	}
+	
+	public List<Usos> getUsoComunidad( ) throws Exception {
+		DAOUsos daoUsos = new DAOUsos();
+		List<Usos> usos = null;
+		try
+		{
+			this.conn = darConexion();
+			daoUsos.setConn(conn);
+			usos = daoUsos.getUsoComunidad();
+			if(usos.isEmpty())
+			{
+				throw new Exception("No se ha usado nunca AloHandes.");				
+			}
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			conn.rollback();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			conn.rollback();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoUsos.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				conn.rollback();
+				throw exception;
+			}
+		}
+		return usos;
+	}
+	
 }
