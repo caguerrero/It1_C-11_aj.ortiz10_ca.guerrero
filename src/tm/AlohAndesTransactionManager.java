@@ -37,6 +37,7 @@ import vos.ReservasDeAlojamiento;
 import vos.Servicio;
 import vos.ServicioDeAlojamiento;
 import vos.Usos;
+import vos.UsosCliente;
 import vos.UsosOperador;
 
 public class AlohAndesTransactionManager {
@@ -2843,7 +2844,49 @@ public class AlohAndesTransactionManager {
 			usos = daoUsos.getUsoOperador(idOperador);
 			if(usos.isEmpty())
 			{
-				throw new Exception("El operador con id " + " no se encuentra persistido en la base de datos.");				
+				throw new Exception("El operador con id " + idOperador + " no se encuentra persistido en la base de datos.");				
+			}
+		} 
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			conn.rollback();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			conn.rollback();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoUsos.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				conn.rollback();
+				throw exception;
+			}
+		}
+		return usos;
+	}
+	
+	public List<UsosCliente> getUsoCliente( Long idCliente ) throws Exception {
+		DAOUsos daoUsos = new DAOUsos();
+		List<UsosCliente> usos = null;
+		try
+		{
+			this.conn = darConexion();
+			daoUsos.setConn(conn);
+			usos = daoUsos.getUsoCliente(idCliente);
+			if(usos.isEmpty())
+			{
+				throw new Exception("El cliente con id " + idCliente + " no se encuentra persistido en la base de datos.");				
 			}
 		} 
 		catch (SQLException sqlException) {

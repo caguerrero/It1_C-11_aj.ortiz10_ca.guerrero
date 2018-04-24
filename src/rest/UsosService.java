@@ -85,7 +85,7 @@ public class UsosService {
 	@GET
 	@Path("cliente")
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getUsoCliente(@QueryParam( "cedula" ) Long idOperador) {
+	public Response getUsoCliente(@QueryParam( "cedula" ) Long idCliente) {
 
 		try {
 			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());

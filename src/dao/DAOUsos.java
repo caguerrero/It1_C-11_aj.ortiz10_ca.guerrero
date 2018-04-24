@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vos.Usos;
+import vos.UsosCliente;
 import vos.UsosOperador;
 
 public class DAOUsos {
@@ -117,6 +118,28 @@ public class DAOUsos {
 			return usosOperador;
 		}
 		
+		public ArrayList<UsosCliente> getUsoCliente(Long idCliente) throws SQLException, Exception {
+			ArrayList<UsosCliente> usosCliente = new ArrayList<UsosCliente>();
+
+			String sql = String.format("SELECT IDCLIENTE, Dias_Total_Reservados, Dias_De_Estadia_Pasados, Total_Cancelado, Total-Total_Cancelado as Total_Por_Pagar " + 
+					"FROM (SELECT IDCLIENTE, SUM(DiasEstadiaPasados) as Dias_De_Estadia_Pasados, SUM(Precio) as Total_Cancelado " + 
+					"FROM (Select IDCLIENTE, FINESTADIA-INICIOESTADIA as DiasEstadiaPasados, Precio FROM Reserva " + 
+					"WHERE FINESTADIA<=SYSDATE " + 
+					"ORDER BY IDCLIENTE) GROUP BY IDCLIENTE) " + 
+					"NATURAL JOIN (SELECT IDCLIENTE, SUM(DiasReservados) as Dias_Total_Reservados, SUM(Precio) as Total " + 
+					"FROM (Select IDCLIENTE, FINESTADIA-INICIOESTADIA as DiasReservados, Precio FROM Reserva ORDER BY IDCLIENTE) WHERE IDCLIENTE = %2$s " + 
+					"GROUP BY IDCLIENTE)", USUARIO, idCliente);
+
+			PreparedStatement prepStmt = conn.prepareStatement(sql);
+			recursos.add(prepStmt);
+			ResultSet rs = prepStmt.executeQuery();
+
+			while (rs.next()) {
+				usosCliente.add(convertResultSetToUsoCliente(rs));
+			}
+			return usosCliente;
+		}
+		
 
 		//----------------------------------------------------------------------------------------------------------------------------------
 		// METODOS AUXILIARES
@@ -165,6 +188,17 @@ public class DAOUsos {
 			double total_por_recibir = resultSet.getDouble("TOTAL_POR_RECIBIR");
 			
 			UsosOperador uso = new UsosOperador(cedula_nit, total_reservado, total_estadia, total_ingresos, total_por_recibir);
+
+			return uso;
+		}
+		private UsosCliente convertResultSetToUsoCliente(ResultSet resultSet) throws SQLException {
+			Long idCliente = resultSet.getLong("IDCLIENTE");
+			int dias_total_reservados = resultSet.getInt("DIAS_TOTAL_RESERVADOS");
+			int dias_de_estadia_pasados = resultSet.getInt("DIAS_DE_ESTADIA_PASADOS");
+			double total_cancelado = resultSet.getDouble("TOTAL_CANCELADO");
+			double total_por_pagar = resultSet.getDouble("TOTAL_POR_PAGAR");
+			
+			UsosCliente uso = new UsosCliente(idCliente, dias_total_reservados, dias_de_estadia_pasados, total_cancelado, total_por_pagar);
 
 			return uso;
 		}
