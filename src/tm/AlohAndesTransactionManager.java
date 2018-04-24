@@ -402,6 +402,44 @@ public class AlohAndesTransactionManager {
 		return clientes;
 	}
 
+	public List<Cliente> getClientesFrecuentes(Long idAlojamiento) throws Exception {
+		DAOCliente daoCliente = new DAOCliente();
+		List<Cliente> clientes;
+		try 
+		{
+			this.conn = darConexion();
+			daoCliente.setConn(conn);
+			clientes = daoCliente.getClientesFrecuentes(idAlojamiento);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			conn.rollback();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			conn.rollback();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoCliente.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				conn.rollback();
+				throw exception;
+			}
+		}
+		return clientes;
+	}
+	
 	/**
 	 * Metodo que modela la transaccion que busca el cliente en la base de datos que tiene el ID dado por parametro. <br/>
 	 * @param id -id del cliente a buscar. id != null

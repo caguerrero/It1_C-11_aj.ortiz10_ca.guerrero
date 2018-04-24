@@ -158,6 +158,26 @@ public class DAOCliente {
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
 	}
+	
+	public ArrayList<Cliente> getClientesFrecuentes(Long idApartamento) throws SQLException, Exception {
+		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
+
+		String sql = String.format("SELECT DISTINCT CEDULA, NOMBRE, ROLUNIANDINO FROM (SELECT IDALOJAMIENTO, C.CEDULA, C.NOMBRE, C.ROLUNIANDINO, COUNT(IDRESERVA) as VECES " + 
+				"FROM (((ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO) NATURAL JOIN RESERVA) INNER JOIN CLIENTE C ON RESERVA.IDCLIENTE = C.CEDULA) " + 
+				"WHERE IDALOJAMIENTO = %2$s GROUP BY  IDALOJAMIENTO, C.CEDULA, C.NOMBRE, C.ROLUNIANDINO HAVING COUNT(IDRESERVA)>=3 ORDER BY VECES DESC) UNION SELECT DISTINCT CEDULA, NOMBRE, ROLUNIANDINO  " + 
+				"FROM (SELECT IDALOJAMIENTO, C.CEDULA, C.NOMBRE, C.ROLUNIANDINO, SUM(FINESTADIA-INICIOESTADIA) AS TOTAL_NOCHES " + 
+				"FROM (((ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO) NATURAL JOIN RESERVA) INNER JOIN CLIENTE C ON RESERVA.IDCLIENTE = C.CEDULA) " + 
+				"WHERE IDALOJAMIENTO = %2$s GROUP BY IDALOJAMIENTO, C.CEDULA, C.NOMBRE, C.ROLUNIANDINO HAVING SUM(FINESTADIA-INICIOESTADIA)>=15)", USUARIO, idApartamento);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			clientes.add(convertResultSetToCliente(rs));
+		}
+		return clientes;
+	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// METODOS AUXILIARES

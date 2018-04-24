@@ -73,6 +73,23 @@ public class ClienteService {
 			return Response.status(500).entity(doErrorMessage(e)).build();
 		}
 	}
+	
+	@GET
+	@Path( "frecuentes" )
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getClientesFrecuentes(@QueryParam("idAlojamiento") Long idAlojamiento) {
+
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
+
+			List<Cliente> clientes;
+			clientes = tm.getClientesFrecuentes(idAlojamiento);
+			return Response.status(200).entity(clientes).build();
+		} 
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
+		}
+	}
 
 	/**
 	 * Metodo GET que trae al cliente en la Base de Datos con el ID dado por parametro <br/>
