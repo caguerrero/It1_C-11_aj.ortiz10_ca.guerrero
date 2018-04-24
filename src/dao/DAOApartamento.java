@@ -71,6 +71,23 @@ public class DAOApartamento {
 		return apartamentos;
 	}
 
+	public ArrayList<Apartamento> getApartamentosDisponibles() throws SQLException, Exception {
+		ArrayList<Apartamento> apartamentosDisponibles = new ArrayList<Apartamento>();
+
+		String sql = String.format("SELECT IDAPARTAMENTO, MENAJE, NUMHABITACIONES FROM %1$s.APARTAMENTO INNER JOIN " + 
+				"((SELECT * FROM %1$s.ALOJAMIENTO) MINUS (SELECT DISTINCT CAPACIDAD, A.IDALOJAMIENTO, TAMAÑO, UBICACION, HABILITADO, FECHA_APERTURA "
+				+ "FROM %1$s.ALOJAMIENTO A INNER JOIN %1$s.RESERVASDEALOJAMIENTO RA ON A.IDALOJAMIENTO = RA.IDALOJAMIENTO)) M ON APARTAMENTO.IDAPARTAMENTO = M. IDALOJAMIENTO", USUARIO);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			apartamentosDisponibles.add(convertResultSetToApartamento(rs));
+		}
+		return apartamentosDisponibles;
+	}
+	
 	/**
 	 * Metodo que obtiene la informacion del apartamento en la Base de Datos que tiene el identificador dado por parametro<br/>
 	 * <b>Precondicion: </b> la conexion a sido inicializadoa <br/> 
@@ -200,4 +217,6 @@ public class DAOApartamento {
 		Apartamento ap = new Apartamento(idapartamento, menaje, numHabitaciones);
 		return ap;
 	}
+
+
 }

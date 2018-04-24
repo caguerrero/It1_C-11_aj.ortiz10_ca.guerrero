@@ -11,6 +11,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -125,6 +126,24 @@ public class ReservasService {
 		}
 	}
 
+	@POST
+	@Path( "registroMasivo" )
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response registrarReservaMasiva(Reserva reserva, @QueryParam( "tipoAlojamiento" ) String tipoAlojamiento, @QueryParam( "cantidadAlojamientos" ) int cantidadAlojamientos) {
+
+		try{
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager( getPath( ) );
+			tm.registrarReservaMasiva(reserva, tipoAlojamiento, cantidadAlojamientos);
+			System.out.println("ENTRA");
+			return Response.status(200).entity(reserva).build();
+		}
+		catch( Exception e )
+		{
+			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		}
+	}
+	
 	/**
 	 * Metodo que recibe un reserva en formato JSON y lo agrega a la Base de Datos <br/>
 	 * <b>Precondicion: </b> El archivo <em>'conectionData'</em> ha sido inicializado con las credenciales del usuario <br/>

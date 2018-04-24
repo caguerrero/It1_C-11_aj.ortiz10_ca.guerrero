@@ -1386,6 +1386,91 @@ public class AlohAndesTransactionManager {
 	 * @param reserva - el reserva a agregar. reserva != null
 	 * @throws Exception - Cualquier error que se genere agregando el reserva
 	 */
+	public void registrarReservaMasiva(Reserva reserva, String tipoAlojamiento, int cantidadAlojamientos) throws Exception 
+	{
+
+		DAOReserva daoReserva = new DAOReserva( );
+		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
+		DAOApartamento daoApartamento = new DAOApartamento();
+		DAOHabitacion daoHabitacion = new DAOHabitacion();
+		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento();
+		try
+		{
+			this.conn = darConexion();
+			daoReserva.setConn(conn);
+			daoAlojamiento.setConn(conn);
+			daoApartamento.setConn(conn);
+			daoHabitacion.setConn(conn);
+			daoReservasDeAlojamiento.setConn(conn);
+			
+			Long numReservas = (long) daoReserva.getReservas().size();
+			int numAlojamientosDisponibles = daoAlojamiento.getAlojamientosDisponibles().size();
+			Long numHabitacionesDisponibles = (long) daoHabitacion.getHabitacionesDisponibles().size();
+			Long numApartamentosDisponibles = (long) daoApartamento.getApartamentosDisponibles().size();
+			ArrayList<Apartamento> apartamentosDisponibles = daoApartamento.getApartamentosDisponibles();
+			ArrayList<Habitacion> habitacionesDisponibles = daoHabitacion.getHabitacionesDisponibles();
+
+			if(numAlojamientosDisponibles >= cantidadAlojamientos)
+			{
+				if (tipoAlojamiento.equals("apartamento") && numApartamentosDisponibles >= cantidadAlojamientos) {
+					int i = 0;
+					while(i < cantidadAlojamientos) {
+						ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, apartamentosDisponibles.get(i).getIdApartamento());
+						daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
+						Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), reserva.getIdReserva(), reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
+						daoReserva.addReserva(res);
+						i++;
+					}
+				}
+				else if(tipoAlojamiento.equals("habitacion") && numHabitacionesDisponibles >= cantidadAlojamientos) {
+					int i = 0;
+					while(i < cantidadAlojamientos) {
+						ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, habitacionesDisponibles.get(i).getIdHabitacion());
+						daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
+						Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), reserva.getIdReserva(), reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
+						daoReserva.addReserva(res);
+						i++;
+					}
+				}
+				else {
+					if(numApartamentosDisponibles < cantidadAlojamientos) {
+						throw new Exception("No hay suficientes alojamientos disponibles del tipo apartamento realizar la reserva" + "hay " + numApartamentosDisponibles + " habitaciones disponibles.");
+					}
+					else if(numHabitacionesDisponibles < cantidadAlojamientos){
+						throw new Exception("No hay suficientes alojamientos disponibles del tipo habitacion realizar la reserva " + "hay " + numHabitacionesDisponibles + " habitaciones disponibles.");
+					}
+					else {
+						throw new Exception("Debe ingresar un tipo de alojamiento valido: apartamento o habitacion. Usted ingreso " + tipoAlojamiento);
+					}
+					
+				}
+			}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReserva.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				throw exception;
+			}
+		}
+	}
+
 	public void addReserva(Reserva reserva) throws Exception 
 	{
 
@@ -1420,8 +1505,6 @@ public class AlohAndesTransactionManager {
 			}
 		}
 	}
-
-
 
 	/**
 	 * Metodo que modela la transaccion que actualiza en la base de datos al reserva que entra por parametro.<br/>

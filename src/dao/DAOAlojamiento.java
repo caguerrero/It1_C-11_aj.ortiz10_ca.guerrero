@@ -71,6 +71,23 @@ public class DAOAlojamiento {
 		}
 		return Alojamientos;
 	}
+	
+	public ArrayList<Alojamiento> getAlojamientosDisponibles() throws SQLException, Exception {
+		ArrayList<Alojamiento> AlojamientosDisponibles = new ArrayList<Alojamiento>();
+
+		String sql = String.format("(SELECT * FROM %1$s.ALOJAMIENTO) " + 
+				"MINUS (SELECT DISTINCT CAPACIDAD, A.IDALOJAMIENTO, TAMAÑO, UBICACION, HABILITADO, FECHA_APERTURA "
+				+ "FROM %1$s.ALOJAMIENTO A INNER JOIN %1$s.RESERVASDEALOJAMIENTO RA ON A.IDALOJAMIENTO = RA.IDALOJAMIENTO)", USUARIO);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			AlojamientosDisponibles.add(convertResultSetToAlojamiento(rs));
+		}
+		return AlojamientosDisponibles;
+	}
 
 	/**
 	 * Metodo que obtiene la informacion del Alojamiento en la Base de Datos que tiene el identificador dado por parametro<br/>

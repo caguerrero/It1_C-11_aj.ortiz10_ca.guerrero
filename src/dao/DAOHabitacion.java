@@ -71,6 +71,24 @@ public class DAOHabitacion {
 		}
 		return habitaciones;
 	}
+	
+	public ArrayList<Habitacion> getHabitacionesDisponibles() throws SQLException, Exception {
+		ArrayList<Habitacion> habitacionesDisponibles = new ArrayList<Habitacion>();
+
+		String sql = String.format("SELECT IDHABITACION, CATEGORIA, COMPARTIDO, TIPO " + 
+				"FROM HABITACION INNER JOIN ((SELECT * FROM ALOJAMIENTO) MINUS " + 
+				"(SELECT DISTINCT CAPACIDAD, A.IDALOJAMIENTO, TAMAÑO, UBICACION, HABILITADO, FECHA_APERTURA "
+				+ "FROM ALOJAMIENTO A INNER JOIN RESERVASDEALOJAMIENTO RA ON A.IDALOJAMIENTO = RA.IDALOJAMIENTO)) M ON HABITACION.IDHABITACION = M.IDALOJAMIENTO", USUARIO);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			habitacionesDisponibles.add(convertResultSetToHabitacion(rs));
+		}
+		return habitacionesDisponibles;
+	}
 
 	/**
 	 * Metodo que obtiene la informacion del habitacion en la Base de Datos que tiene el identificador dado por parametro<br/>

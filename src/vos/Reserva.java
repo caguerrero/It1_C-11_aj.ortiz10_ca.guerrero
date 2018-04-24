@@ -33,7 +33,6 @@ public class Reserva {
 	 * @param inicioEstadia
 	 * @param precio
 	 * @param idCliente
-	 * @param idAlojamiento
 	 * @param cancelado
 	 */
 	public Reserva(@JsonProperty(value="fechaReserva")Date fechaReserva, @JsonProperty(value="finEstadia")Date finEstadia, @JsonProperty(value="idReserva")Long idReserva, @JsonProperty(value="inicioEstadia")Date inicioEstadia, 

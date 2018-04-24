@@ -108,7 +108,7 @@ public class DAOReserva {
 	 */
 	public void addReserva(Reserva reserva) throws SQLException, Exception {
 
-		String sql = String.format("INSERT INTO %1$s.RESERVA (FECHARESERVA, FINESTADIA, IDRESERVA, INICIOESTADIA, PRECIO, IDCLIENTE, CANCELADO) VALUES (TO_DATE('%2$s', 'YYYY-MM-DD'), TO_DATE('%3$s', 'YYYY-MM-DD'), %4$s, TO_DATE('%5$s', 'YYYY-MM-DD'), %6$s,%7$s)",
+		String sql = String.format("INSERT INTO %1$s.RESERVA (FECHARESERVA, FINESTADIA, IDRESERVA, INICIOESTADIA, PRECIO, IDCLIENTE, CANCELADO) VALUES (TO_DATE('%2$s', 'YYYY-MM-DD'), TO_DATE('%3$s', 'YYYY-MM-DD'), %4$s, TO_DATE('%5$s', 'YYYY-MM-DD'), %6$s,%7$s,%8$s)",
 				USUARIO,
 				reserva.getFechaReserva(),
 				reserva.getFinEstadia(),
@@ -116,7 +116,7 @@ public class DAOReserva {
 				reserva.getInicioEstadia(),
 				reserva.getPrecio(),
 				reserva.getIdCliente(),
-		        reserva.getCancelado());
+				reserva.getCancelado());
 		System.out.println(sql);
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
@@ -164,37 +164,54 @@ public class DAOReserva {
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
 	}
-	
+
 	public void registrarReservaMasiva(Reserva reservaParam, String tipoAlojamiento, int cantidadAlojamientos) throws SQLException, Exception {
+		
 		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
+		DAOApartamento daoApartamento = new DAOApartamento();
+		DAOHabitacion daoHabitacion = new DAOHabitacion();
 		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento();
 		Long numReservas = (long) getReservas().size();
-		int numAlojamientos = daoAlojamiento.getAlojamientos().size();
-		int numAlojamientosDisponibles = numAlojamientos - daoReservasDeAlojamiento.getAllReservassDeAlojamiento().size();
-		if(numAlojamientosDisponibles < )
-		while(i < cantidadAlojamientos)
+		int numAlojamientosDisponibles = daoAlojamiento.getAlojamientosDisponibles().size();
+		Long numHabitacionesDisponibles = (long) daoHabitacion.getHabitacionesDisponibles().size();
+		Long numApartamentosDisponibles = (long) daoApartamento.getApartamentosDisponibles().size();
+		ArrayList<Apartamento> apartamentosDisponibles = daoApartamento.getApartamentosDisponibles();
+		ArrayList<Habitacion> habitacionesDisponibles = daoHabitacion.getHabitacionesDisponibles();
+
+		if(numAlojamientosDisponibles >= cantidadAlojamientos)
 		{
-			Reserva reserva = new Reserva(reservaParam.getFechaReserva(), reservaParam.getFinEstadia(), numReservas + i, reservaParam.getInicioEstadia(), reservaParam.getPrecio(), reservaParam.getIdCliente(), 0);
-			
-			ReservasDeAlojamiento ra = new ReservasDeAlojamiento(numReservas + i, idAlojamiento);
-			if (tipoAlojamiento.equals("apartamento") ) {
-				reservasdeal.addReservasDeAlojamiento(a);
-				DAOApartamento ap = new DAOApartamento();
-				ap.findApartamentoById(id);
-				Apartamento apa = new Apartamento(idApartamento, menaje, numHabitaciones)
+			if (tipoAlojamiento.equals("apartamento") && numApartamentosDisponibles >= cantidadAlojamientos) {
+				int i = 0;
+				while(i < cantidadAlojamientos) {
+					ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, apartamentosDisponibles.get(i).getIdApartamento());
+					daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
+					Reserva res = new Reserva(reservaParam.getFechaReserva(), reservaParam.getFinEstadia(), reservaParam.getIdReserva(), reservaParam.getInicioEstadia(), reservaParam.getPrecio(), reservaParam.getIdCliente(), 0);
+					addReserva(res);
+					i++;
+				}
 			}
-			else if(tipoAlojamiento.equals("habitacion")) {
-				reservasdeal.addReservasDeAlojamiento(a);
-				DAOHabitacion hab = new DAOHabitacion();
-				hab.findHabitacionById(id);
-				Habitacion h = new Habitacion(idHabitacion, categoria, compartido, tipo)
+			else if(tipoAlojamiento.equals("habitacion") && numHabitacionesDisponibles >= cantidadAlojamientos) {
+				int i = 0;
+				while(i < cantidadAlojamientos) {
+					ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, habitacionesDisponibles.get(i).getIdHabitacion());
+					daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
+					Reserva res = new Reserva(reservaParam.getFechaReserva(), reservaParam.getFinEstadia(), reservaParam.getIdReserva(), reservaParam.getInicioEstadia(), reservaParam.getPrecio(), reservaParam.getIdCliente(), 0);
+					addReserva(res);
+					i++;
+				}
 			}
 			else {
-				throw new Exception("Debe ingresar un tipo de alojamiento valido: apartamento o habitacion.");
+				if(numApartamentosDisponibles < cantidadAlojamientos) {
+					throw new Exception("No hay suficientes alojamientos disponibles del tipo apartamento realizar la reserva" + "hay " + numApartamentosDisponibles + " habitaciones disponibles.");
+				}
+				else if(numHabitacionesDisponibles < cantidadAlojamientos){
+					throw new Exception("No hay suficientes alojamientos disponibles del tipo habitacion realizar la reserva " + "hay " + numHabitacionesDisponibles + " habitaciones disponibles.");
+				}
+				else {
+					throw new Exception("Debe ingresar un tipo de alojamiento valido: apartamento o habitacion. Usted ingreso " + tipoAlojamiento);
+				}
+				
 			}
-			
-			addReserva(reserva);
-			i++;
 		}
 	}
 
@@ -241,7 +258,7 @@ public class DAOReserva {
 		Date inicioEstadia = resultSet.getDate("INICIOESTADIA");
 		double precio = resultSet.getDouble("PRECIO");
 		int cancelado = resultSet.getInt("CANCELADO");
-		
+
 		Reserva res = new Reserva(fechaReserva, finEstadia, idReserva, inicioEstadia, precio, idCliente, cancelado);
 
 		return res;
