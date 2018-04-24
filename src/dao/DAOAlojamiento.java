@@ -124,7 +124,7 @@ public class DAOAlojamiento {
 	 */
 	public void addAlojamiento(Alojamiento Alojamiento) throws SQLException, Exception {
 
-		String sql = String.format("INSERT INTO %1$s.ALOJAMIENTO (IDALOJAMIENTO, CAPACIDAD, TAMAÑO, UBICACION, HABILITADO, FECHA_APERTURA) VALUES (%2$s, '%3$s', '%4$s', '%5$s', '%6$s', %7$s)",
+		String sql = String.format("INSERT INTO %1$s.ALOJAMIENTO (IDALOJAMIENTO, CAPACIDAD, TAMAÑO, UBICACION, HABILITADO, FECHA_APERTURA) VALUES (%2$s, '%3$s', '%4$s', '%5$s', '%6$s', (TO_DATE('%7$s', 'YYYY-MM-DD'))",
 				USUARIO, 
 				Alojamiento.getIdAlojamiento(),
 				Alojamiento.getCapacidad(),

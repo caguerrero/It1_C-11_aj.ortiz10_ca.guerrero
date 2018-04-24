@@ -99,7 +99,7 @@ public class AlohAndesTransactionManager {
 	 * @throws ClassNotFoundException 
 	 */
 	public AlohAndesTransactionManager(String contextPathP) {
-
+		
 		try {
 			CONNECTION_DATA_PATH = contextPathP + CONNECTION_DATA_FILE_NAME_REMOTE;
 			initializeConnectionData();
@@ -108,6 +108,10 @@ public class AlohAndesTransactionManager {
 			e.printStackTrace();
 		}
 		catch (IOException e) {
+			e.printStackTrace();
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
 		}
 	}
@@ -440,7 +444,7 @@ public class AlohAndesTransactionManager {
 		}
 		return clientes;
 	}
-	
+
 	/**
 	 * Metodo que modela la transaccion que busca el cliente en la base de datos que tiene el ID dado por parametro. <br/>
 	 * @param id -id del cliente a buscar. id != null
@@ -1036,7 +1040,7 @@ public class AlohAndesTransactionManager {
 			}
 		}
 	}
-	
+
 	public List<Alojamiento> getAlojamientosFiltrados(String fecha1, String fecha2, List<String> servicios) throws Exception {
 		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
 		List<Alojamiento> alojamientos;
@@ -1082,7 +1086,7 @@ public class AlohAndesTransactionManager {
 		}
 		return alojamientos;
 	}
-	
+
 	public List<Ocupacion> getOcupacionAlojamientos() throws Exception {
 		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
 		List<Ocupacion> ocupacionAlojamientos;
@@ -1335,7 +1339,7 @@ public class AlohAndesTransactionManager {
 			else
 			{
 				throw new Exception("El operador con ID " + operador.getCedula_NIT() + " no se encuentra en la base de datos");
-				}
+			}
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
@@ -1467,7 +1471,6 @@ public class AlohAndesTransactionManager {
 	public void registrarReservaMasiva(Reserva reserva, String tipoAlojamiento, int cantidadAlojamientos) throws Exception 
 	{
 
-		
 		DAOReserva daoReserva = new DAOReserva();
 		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
 		DAOApartamento daoApartamento = new DAOApartamento();
@@ -1475,66 +1478,64 @@ public class AlohAndesTransactionManager {
 		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento();
 		try
 		{
-			
+
 			this.conn = darConexion();
 			daoReserva.setConn(conn);
 			daoAlojamiento.setConn(conn);
 			daoApartamento.setConn(conn);
 			daoHabitacion.setConn(conn);
 			daoReservasDeAlojamiento.setConn(conn);
-			
-			Long numReservas = (long) daoReserva.getReservas().size();
-			System.out.println(numReservas);
+
 			int numAlojamientosDisponibles = daoAlojamiento.getAlojamientosDisponibles().size();
 			Long numHabitacionesDisponibles = (long) daoHabitacion.getHabitacionesDisponibles().size();
 			Long numApartamentosDisponibles = (long) daoApartamento.getApartamentosDisponibles().size();
+			Long numReservas = (long) daoReserva.getReservas().size();
+			System.out.println(numApartamentosDisponibles);
 			ArrayList<Apartamento> apartamentosDisponibles = daoApartamento.getApartamentosDisponibles();
 			ArrayList<Habitacion> habitacionesDisponibles = daoHabitacion.getHabitacionesDisponibles();
 
 			if(numAlojamientosDisponibles >= cantidadAlojamientos)
 			{
 				if (tipoAlojamiento.equals("apartamento") && numApartamentosDisponibles >= cantidadAlojamientos) {
+					Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), numReservas + 1, reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
+					daoReserva.addReserva(res);
 					int i = 1;
 					while(i <= cantidadAlojamientos) {
-						Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), numReservas + i, reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
-						daoReserva.addReserva(res);
-						ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, apartamentosDisponibles.get(i).getIdApartamento());
+						System.out.println("APARTAMENTO");
+						ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(res.getIdReserva(), apartamentosDisponibles.get(i).getIdApartamento());
 						System.out.println(resAl.getIdAlojamiento());
 						System.out.println(resAl.getIdReserva());
 						daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
-						
-						i++;
-						conn.commit();
+
+						i++;	
 					}
+					conn.commit();
 				}
-			    if(tipoAlojamiento.equals("habitacion") && numHabitacionesDisponibles >= cantidadAlojamientos) {
+				else if(tipoAlojamiento.equals("habitacion") && numHabitacionesDisponibles >= cantidadAlojamientos) {
+					Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), numReservas + 1, reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
+					daoReserva.addReserva(res);
 					int i = 1;
 					while(i <= cantidadAlojamientos) {
-						Reserva res = new Reserva(reserva.getFechaReserva(), reserva.getFinEstadia(), numReservas + i, reserva.getInicioEstadia(), reserva.getPrecio(), reserva.getIdCliente(), 0);
-						daoReserva.addReserva(res);
-						ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(numReservas + i, habitacionesDisponibles.get(i).getIdHabitacion());
+						ReservasDeAlojamiento resAl = new ReservasDeAlojamiento(res.getIdReserva(), habitacionesDisponibles.get(i).getIdHabitacion());
 						System.out.println(resAl.getIdAlojamiento());
 						System.out.println(resAl.getIdReserva());
 						daoReservasDeAlojamiento.addReservasDeAlojamiento(resAl);
-						
+
 						i++;
-						conn.commit();
 					}
+					conn.commit();
 				}
-				else {
-					if(numApartamentosDisponibles < cantidadAlojamientos) {
-						conn.rollback();
-						throw new Exception("No hay suficientes alojamientos disponibles del tipo apartamento realizar la reserva" + "hay " + numApartamentosDisponibles + " habitaciones disponibles.");
-					}
-					else if(numHabitacionesDisponibles < cantidadAlojamientos) {
-						conn.rollback();
-						throw new Exception("No hay suficientes alojamientos disponibles del tipo habitacion realizar la reserva " + "hay " + numHabitacionesDisponibles + " habitaciones disponibles.");
-					}
-					else {
-						conn.rollback();
-						throw new Exception("Debe ingresar un tipo de alojamiento valido: apartamento o habitacion. Usted ingreso " + tipoAlojamiento);
-					}
-					
+				else if(numApartamentosDisponibles < cantidadAlojamientos) {
+					conn.rollback();
+					throw new Exception("No hay suficientes alojamientos disponibles del tipo apartamento realizar la reserva" + "hay " + numApartamentosDisponibles + " habitaciones disponibles.");
+				}
+				else if(numHabitacionesDisponibles < cantidadAlojamientos) {
+					conn.rollback();
+					throw new Exception("No hay suficientes alojamientos disponibles del tipo habitacion realizar la reserva " + "hay " + numHabitacionesDisponibles + " habitaciones disponibles.");
+				}
+				else if (!tipoAlojamiento.equals("habitacion") || !tipoAlojamiento.equals("alojamiento")){
+					conn.rollback();
+					throw new Exception("Debe ingresar un tipo de alojamiento valido: apartamento o habitacion. Usted ingreso " + tipoAlojamiento);
 				}
 			}
 		}
@@ -1564,7 +1565,50 @@ public class AlohAndesTransactionManager {
 				throw exception;
 			}
 		}
-		
+
+	}
+	
+	public void cancelarReservaMasiva(Long idReserva) throws Exception {
+		DAOReserva daoReserva = new DAOReserva( );
+		try
+		{
+			this.conn = darConexion();
+			daoReserva.setConn( conn );
+			if(daoReserva.findReservaById(idReserva) != null) {
+				daoReserva.deleteReservaMasiva(idReserva);
+				conn.commit();
+			}
+			else
+			{
+				throw new Exception("La reserva con ID " + idReserva + " no se encuentra en la base de datos");
+			}
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			conn.rollback();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			conn.rollback();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoReserva.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				conn.rollback();
+				throw exception;
+			}
+		}	
 	}
 
 	public void addReserva(Reserva reserva) throws Exception 
@@ -1824,7 +1868,7 @@ public class AlohAndesTransactionManager {
 			try {
 				daoServicio.cerrarRecursos();
 				if(this.conn!=null){
-					this.conn.close();					
+					this.conn.close();
 				}
 			}
 			catch (SQLException exception) {
@@ -2831,7 +2875,7 @@ public class AlohAndesTransactionManager {
 			}
 		}	
 	}
-	
+
 	public List<Usos> getUsoComunidad( ) throws Exception {
 		DAOUsos daoUsos = new DAOUsos();
 		List<Usos> usos = null;
@@ -2873,7 +2917,7 @@ public class AlohAndesTransactionManager {
 		}
 		return usos;
 	}
-	
+
 	public List<UsosOperador> getUsoOperador( Long idOperador ) throws Exception {
 		DAOUsos daoUsos = new DAOUsos();
 		List<UsosOperador> usos = null;
@@ -2915,7 +2959,7 @@ public class AlohAndesTransactionManager {
 		}
 		return usos;
 	}
-	
+
 	public List<UsosCliente> getUsoCliente( Long idCliente ) throws Exception {
 		DAOUsos daoUsos = new DAOUsos();
 		List<UsosCliente> usos = null;
@@ -2957,7 +3001,7 @@ public class AlohAndesTransactionManager {
 		}
 		return usos;
 	}
-	
+
 	public List<Operacion> getOperacionAloHandes(String fecha1, String fecha2) throws Exception {
 		DAOUsos daoUsos = new DAOUsos();
 		List<Operacion> operaciones = null;
