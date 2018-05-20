@@ -219,7 +219,9 @@ public class DAOHabitacion {
 		String categoria = resultSet.getString("CATEGORIA");
 		String compartido = resultSet.getString("COMPARTIDO");
 		String tipo = resultSet.getString("TIPO");
-		Habitacion habitacion = new Habitacion(idHabitacion, categoria, compartido, tipo);
+		int numeroCupos = resultSet.getInt("NUMEROCUPOS");
+		Habitacion habitacion = new Habitacion(idHabitacion, categoria, compartido, tipo, numeroCupos);
+		
 		return habitacion;
 	}
 }

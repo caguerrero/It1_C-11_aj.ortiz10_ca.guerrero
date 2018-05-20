@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import vos.*;
 public class DAOCliente {
@@ -158,16 +159,92 @@ public class DAOCliente {
 		recursos.add(prepStmt);
 		prepStmt.executeQuery();
 	}
-	
+
 	public ArrayList<Cliente> getClientesFrecuentes(Long idApartamento) throws SQLException, Exception {
 		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 
 		String sql = String.format("SELECT DISTINCT CEDULA, NOMBRE, ROLUNIANDINO FROM (SELECT IDALOJAMIENTO, C.CEDULA, C.NOMBRE, C.ROLUNIANDINO, COUNT(IDRESERVA) as VECES " + 
-				"FROM (((ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO) NATURAL JOIN RESERVA) INNER JOIN CLIENTE C ON RESERVA.IDCLIENTE = C.CEDULA) " + 
+				"FROM (((%1$s.ALOJAMIENTO NATURAL JOIN %1$s.RESERVASDEALOJAMIENTO) NATURAL JOIN %1$s.RESERVA) INNER JOIN %1$s.CLIENTE C ON RESERVA.IDCLIENTE = C.CEDULA) " + 
 				"WHERE IDALOJAMIENTO = %2$s GROUP BY  IDALOJAMIENTO, C.CEDULA, C.NOMBRE, C.ROLUNIANDINO HAVING COUNT(IDRESERVA)>=3 ORDER BY VECES DESC) UNION SELECT DISTINCT CEDULA, NOMBRE, ROLUNIANDINO  " + 
 				"FROM (SELECT IDALOJAMIENTO, C.CEDULA, C.NOMBRE, C.ROLUNIANDINO, SUM(FINESTADIA-INICIOESTADIA) AS TOTAL_NOCHES " + 
-				"FROM (((ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO) NATURAL JOIN RESERVA) INNER JOIN CLIENTE C ON RESERVA.IDCLIENTE = C.CEDULA) " + 
+				"FROM (((%1$s.ALOJAMIENTO NATURAL JOIN %1$s.RESERVASDEALOJAMIENTO) NATURAL JOIN %1$s.RESERVA) INNER JOIN %1$s.CLIENTE C ON RESERVA.IDCLIENTE = C.CEDULA) " + 
 				"WHERE IDALOJAMIENTO = %2$s GROUP BY IDALOJAMIENTO, C.CEDULA, C.NOMBRE, C.ROLUNIANDINO HAVING SUM(FINESTADIA-INICIOESTADIA)>=15)", USUARIO, idApartamento);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			clientes.add(convertResultSetToCliente(rs));
+		}
+		return clientes;
+	}
+
+	public ArrayList<Cliente> getClientesConsumoAdmin(Long idAlojamiento, String fechaInicio, String fechaFinal, List<String> filtros) throws SQLException, Exception {
+		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
+
+		String presql = "SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO FROM (%1$s.CLIENTE INNER JOIN %1$s.RESERVA ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) "
+				+ "INNER JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA " + 
+				"WHERE IDALOJAMIENTO = %2$s AND FECHARESERVA BETWEEN TO_DATE('%3$s', 'DD/MM/YYYY') AND TO_DATE('%4$s', 'DD/MM/YYYY') "
+				+ "ORDER BY ";
+
+		for(int i = 0; i < filtros.size(); i++)
+		{
+			if(i == 0) {
+				presql = presql + filtros.get(i);
+			}
+			else
+			{
+				presql += "," + filtros.get(i);
+			}
+		}
+
+		System.out.println(presql);
+
+		String sql = String.format(presql, USUARIO, idAlojamiento, fechaInicio, fechaFinal);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			clientes.add(convertResultSetToCliente(rs));
+		}
+		return clientes;
+	}
+
+	public ArrayList<Cliente> getClientesConsumoProveedor(Long idAlojamiento, String fechaInicio, String fechaFinal, List<String> filtros, Long idProveedor) throws SQLException, Exception {
+		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
+
+		String sql = String.format("SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO " + 
+				"FROM ((%1$s.CLIENTE INNER JOIN %1$s.RESERVA ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) " + 
+				"INNER JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA) " + 
+				"INNER JOIN %1$s.ALOJAMIENTO ON RESERVASDEALOJAMIENTO.IDALOJAMIENTO=ALOJAMIENTO.IDALOJAMIENTO " + 
+				"WHERE (ALOJAMIENTO.IDALOJAMIENTO = %2$s) AND (FECHARESERVA BETWEEN TO_DATE('%3$s', 'DD/MM/YYYY') AND TO_DATE('%4$s', 'DD/MM/YYYY')) AND IDOPERADOR = %5$s" + 
+				"ORDER BY CEDULA, NOMBRE, ROLUNIANDINO", USUARIO, idAlojamiento, fechaInicio, fechaFinal, idProveedor);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			clientes.add(convertResultSetToCliente(rs));
+		}
+		return clientes;
+	}
+
+	public ArrayList<Cliente> getClientesConsumoNoReserva(Long idAlojamiento, String fechaInicio, String fechaFinal) throws SQLException, Exception {
+		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
+
+		String sql = String.format("SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO " + 
+				"FROM (SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO " + 
+				"FROM (%1$s.CLIENTE FULL OUTER JOIN %1$s.RESERVA ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) " + 
+				"FULL OUTER JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA " + 
+				"MINUS SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO FROM (%1$s.CLIENTE JOIN %1$s.RESERVA " + 
+				"ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) " + 
+				"JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA " + 
+				"WHERE IDALOJAMIENTO = %2$s AND FECHARESERVA BETWEEN '%3$s' AND '%4$s' ORDER BY CEDULA, NOMBRE, ROLUNIANDINO", 
+				USUARIO, idAlojamiento, fechaInicio, fechaFinal);
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
@@ -214,7 +291,7 @@ public class DAOCliente {
 	 * @throws SQLException Si existe algun problema al extraer la informacion del ResultSet.
 	 */
 	public Cliente convertResultSetToCliente(ResultSet resultSet) throws SQLException {
-		
+
 		Long cedula = resultSet.getLong("CEDULA");
 		String nombre = resultSet.getString("NOMBRE");
 		String roluniandino = resultSet.getString("ROLUNIANDINO");

@@ -1,5 +1,6 @@
 package rest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -11,13 +12,14 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import tm.AlohAndesTransactionManager;
+import vos.Cliente;
 import vos.Operador;
-import vos.Pago;
 
 @Path("operadores")
 public class OperadoresService {
@@ -172,22 +174,64 @@ public class OperadoresService {
 			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
 		}
 	}
+	@GET
+	@Path( "consumo" )
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getClientesConsumoProveedor(@QueryParam("idAlojamiento") Long idAlojamiento,@QueryParam("fechaInicio") String fechaInicio, @QueryParam("fechaFinal") String fechaFinal,
+			@QueryParam("filtros") String filtros, @QueryParam("idOperador") Long idOperador) {
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
+			String[] filtros1 = filtros.split(" ");
+			List<String> filtros2 = new ArrayList<String>();
+			int i = 0;
+			while(i < filtros1.length) {
+				filtros2.add(filtros1[i]);
+				i++;
+			}
+			List<Cliente> clientes;
+			clientes = tm.getClientesConsumoProveedor(idAlojamiento, fechaInicio, fechaFinal, filtros2, idOperador);
+			return Response.status(200).entity(clientes).build();
+		}
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
+		}
+	}
+	@GET
+	@Path( "consumoAdmin" )
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getClientesConsumoAdmin(@QueryParam("idAlojamiento") Long idAlojamiento,@QueryParam("fechaInicio") String fechaInicio, @QueryParam("fechaFinal") String fechaFinal,
+			@QueryParam("filtros") String filtros) {
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
+			String[] filtros1 = filtros.split(" ");
+			List<String> filtros2 = new ArrayList<String>();
+			int i = 0;
+			while(i < filtros1.length) {
+				filtros2.add(filtros1[i]);
+				i++;
+			}
+			List<Cliente> clientes;
+			clientes = tm.getClientesConsumoAdmin(idAlojamiento, fechaInicio, fechaFinal, filtros2);
+			return Response.status(200).entity(clientes).build();
+		}
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
+		}
+	}
 
 	@GET
-	@Path( "pagos" )
-	@Produces( { MediaType.APPLICATION_JSON } )
-	public Response getPagosOperadores( )
-	{
-		try{
-			AlohAndesTransactionManager tm = new AlohAndesTransactionManager( getPath( ) );
+	@Path( "consumoNoReserva" )
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getClientesConsumoNoReserva(@QueryParam("idAlojamiento") Long idAlojamiento,@QueryParam("fechaInicio") String fechaInicio, @QueryParam("fechaFinal") String fechaFinal) {
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
 
-			List<Pago> pagos;
-			pagos = tm.getPagosOperadores();
-			return Response.status( 200 ).entity( pagos ).build( );
+			List<Cliente> clientes;
+			clientes = tm.getClientesConsumoNoReserva(idAlojamiento, fechaInicio, fechaFinal);
+			return Response.status(200).entity(clientes).build();
 		}
-		catch( Exception e )
-		{
-			return Response.status( 500 ).entity( doErrorMessage( e ) ).build( );
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
 		}
 	}
 }

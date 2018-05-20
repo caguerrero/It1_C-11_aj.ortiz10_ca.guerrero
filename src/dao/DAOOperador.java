@@ -222,8 +222,9 @@ public class DAOOperador {
 		String direccion = resultSet.getString("DIRECCION");
 		String nombre = resultSet.getString("NOMBRE");
 		String tipo = resultSet.getString("TIPO");
-
-		Operador op = new Operador(cedula_NIT, direccion, nombre, tipo);
+		String horarioApertura = resultSet.getString("HORARIOAPERTURA");
+		String horarioCierre = resultSet.getString("HORARIOCIERRE");
+		Operador op = new Operador(cedula_NIT, direccion, nombre, tipo, horarioApertura, horarioCierre);
 
 		return op;
 	}

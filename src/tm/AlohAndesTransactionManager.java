@@ -13,7 +13,6 @@ import java.util.Properties;
 import dao.DAOApartamento;
 import dao.DAOCliente;
 import dao.DAOHabitacion;
-import dao.DAOOferta;
 import dao.DAOAlojamiento;
 import dao.DAOAlojamientosDeOferta;
 import dao.DAOOperador;
@@ -26,13 +25,10 @@ import vos.Apartamento;
 import vos.Cliente;
 import vos.Habitacion;
 import vos.Ocupacion;
-import vos.Oferta;
 import vos.Operacion;
 import vos.Alojamiento;
 import vos.AlojamientosDeOferta;
 import vos.Operador;
-import vos.Pago;
-import vos.Popular;
 import vos.Reserva;
 import vos.ReservasDeAlojamiento;
 import vos.Servicio;
@@ -99,7 +95,7 @@ public class AlohAndesTransactionManager {
 	 * @throws ClassNotFoundException 
 	 */
 	public AlohAndesTransactionManager(String contextPathP) {
-		
+
 		try {
 			CONNECTION_DATA_PATH = contextPathP + CONNECTION_DATA_FILE_NAME_REMOTE;
 			initializeConnectionData();
@@ -415,6 +411,138 @@ public class AlohAndesTransactionManager {
 			this.conn = darConexion();
 			daoCliente.setConn(conn);
 			clientes = daoCliente.getClientesFrecuentes(idAlojamiento);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			conn.rollback();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			conn.rollback();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoCliente.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				conn.rollback();
+				throw exception;
+			}
+		}
+		return clientes;
+	}
+
+	public List<Cliente> getClientesConsumoAdmin(Long idAlojamiento,String fechaInicio, String fechaFinal, List<String> filtros) throws Exception {
+		DAOCliente daoCliente = new DAOCliente();
+		List<Cliente> clientes;
+		try 
+		{
+			this.conn = darConexion();
+			daoCliente.setConn(conn);
+			int i = 0;
+			while(i < filtros.size())
+			{
+				if(!filtros.get(i).equals("CEDULA") && !filtros.get(i).equals("NOMBRE") && !filtros.get(i).equals("ROLUNIANDINO"))
+				{
+					throw new Exception( filtros.get(i) + " no es un filtro valido." + " Los filtros que se pueden aplicar son unicamente: CEDULA, NOMBRE O ROLUNIANDINO. Separados por espacios.");
+				}
+				i++;
+			}
+			clientes = daoCliente.getClientesConsumoAdmin(idAlojamiento, fechaInicio, fechaFinal, filtros);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			conn.rollback();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			conn.rollback();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoCliente.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				conn.rollback();
+				throw exception;
+			}
+		}
+		return clientes;
+	}
+
+	public List<Cliente> getClientesConsumoProveedor(Long idAlojamiento,String fechaInicio, String fechaFinal, List<String> filtros, Long idProveedor) throws Exception {
+		DAOCliente daoCliente = new DAOCliente();
+		List<Cliente> clientes;
+		try 
+		{
+			this.conn = darConexion();
+			daoCliente.setConn(conn);
+			int i = 0;
+			while(i < filtros.size())
+			{
+				if(!filtros.get(i).equals("CEDULA") && !filtros.get(i).equals("NOMBRE") && !filtros.get(i).equals("ROLUNIANDINO"))
+				{
+					throw new Exception( filtros.get(i) + " no es un filtro valido." + " Los filtros que se pueden aplicar son unicamente: CEDULA, NOMBRE O ROLUNIANDINO. Separados por espacios.");
+				}
+				i++;
+			}
+			clientes = daoCliente.getClientesConsumoProveedor(idAlojamiento, fechaInicio, fechaFinal, filtros, idProveedor);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			conn.rollback();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			conn.rollback();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoCliente.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				conn.rollback();
+				throw exception;
+			}
+		}
+		return clientes;
+	}
+
+	public List<Cliente> getClientesConsumoNoReserva(Long idAlojamiento,String fechaInicio, String fechaFinal) throws Exception {
+		DAOCliente daoCliente = new DAOCliente();
+		List<Cliente> clientes;
+		try 
+		{
+			this.conn = darConexion();
+			daoCliente.setConn(conn);
+			clientes = daoCliente.getClientesConsumoNoReserva(idAlojamiento, fechaInicio, fechaFinal);
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
@@ -1567,7 +1695,7 @@ public class AlohAndesTransactionManager {
 		}
 
 	}
-	
+
 	public void cancelarReservaMasiva(Long idReserva) throws Exception {
 		DAOReserva daoReserva = new DAOReserva( );
 		DAOReservasDeAlojamiento daoReservasDeAlojamiento = new DAOReservasDeAlojamiento();
@@ -2363,303 +2491,6 @@ public class AlohAndesTransactionManager {
 			}
 		}	
 	}
-	//----------------------------------------------------------------------------------------------------------------------------------
-	// TRANSACCIONES DE LA TABLA OFERTAS
-	//----------------------------------------------------------------------------------------------------------------------------------	
-
-	/**
-	 * Metodo que modela la transaccion que retorna todos los ofertas de la base de datos. <br/>
-	 * @return List<Oferta> - Lista de ofertas que contiene el resultado de la consulta.
-	 * @throws Exception -  Cualquier error que se genere durante la transaccion
-	 */
-	public List<Oferta> getAllOfertas() throws Exception {
-		DAOOferta daoOferta = new DAOOferta();
-		List<Oferta> ofertas;
-		try 
-		{
-			this.conn = darConexion();
-			daoOferta.setConn(conn);
-			ofertas = daoOferta.getOfertas();
-		}
-		catch (SQLException sqlException) {
-			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-			sqlException.printStackTrace();
-			throw sqlException;
-		} 
-		catch (Exception exception) {
-			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-			exception.printStackTrace();
-			throw exception;
-		} 
-		finally {
-			try {
-				daoOferta.cerrarRecursos();
-				if(this.conn!=null){
-					this.conn.close();					
-				}
-			}
-			catch (SQLException exception) {
-				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			}
-		}
-		return ofertas;
-	}
-
-	/**
-	 * Metodo que modela la transaccion que busca el oferta en la base de datos que tiene el ID dado por parametro. <br/>
-	 * @param name -id del oferta a buscar. id != null
-	 * @return Oferta - Oferta que se obtiene como resultado de la consulta.
-	 * @throws Exception -  cualquier error que se genere durante la transaccion
-	 */
-	public Oferta getOfertaById(Long id) throws Exception {
-		DAOOferta daoOferta = new DAOOferta();
-		Oferta oferta = null;
-		try 
-		{
-			this.conn = darConexion();
-			daoOferta.setConn(conn);
-			oferta = daoOferta.findOfertaById(id);
-			if(oferta == null)
-			{
-				throw new Exception("El oferta con el id = " + id + " no se encuentra persistido en la base de datos.");				
-			}
-		} 
-		catch (SQLException sqlException) {
-			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-			sqlException.printStackTrace();
-			throw sqlException;
-		} 
-		catch (Exception exception) {
-			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-			exception.printStackTrace();
-			throw exception;
-		} 
-		finally {
-			try {
-				daoOferta.cerrarRecursos();
-				if(this.conn!=null){
-					this.conn.close();					
-				}
-			}
-			catch (SQLException exception) {
-				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			}
-		}
-		return oferta;
-	}
-
-	/**
-	 * Metodo que modela la transaccion que agrega un oferta a la base de datos. <br/>
-	 * <b> post: </b> se ha agregado el oferta que entra como parametro <br/>
-	 * @param oferta - el oferta a agregar. oferta != null
-	 * @throws Exception - Cualquier error que se genere agregando el oferta
-	 */
-	public void addOferta(Oferta oferta) throws Exception 
-	{
-
-		DAOOferta daoOferta = new DAOOferta( );
-		try
-		{
-			this.conn = darConexion();
-			daoOferta.setConn(conn);
-			daoOferta.addOferta(oferta);
-		}
-		catch (SQLException sqlException) {
-			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-			sqlException.printStackTrace();
-			throw sqlException;
-		} 
-		catch (Exception exception) {
-			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-			exception.printStackTrace();
-			throw exception;
-		} 
-		finally {
-			try {
-				daoOferta.cerrarRecursos();
-				if(this.conn!=null){
-					this.conn.close();					
-				}
-			}
-			catch (SQLException exception) {
-				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			}
-		}
-	}
-
-
-
-	/**
-	 * Metodo que modela la transaccion que actualiza en la base de datos al oferta que entra por parametro.<br/>
-	 * Solamente se actualiza si existe el oferta en la Base de Datos <br/>
-	 * <b> post: </b> se ha actualizado el oferta que entra como parametro <br/>
-	 * @param oferta - Oferta a actualizar. oferta != null
-	 * @throws Exception - Cualquier error que se genere actualizando al oferta.
-	 */
-	public void updateOferta(Oferta oferta) throws Exception 
-	{
-		DAOOferta daoOferta = new DAOOferta( );
-		try
-		{
-			this.conn = darConexion();
-			daoOferta.setConn( conn );
-			if(daoOferta.findOfertaById(oferta.getIdOferta()) !=null)
-			{daoOferta.updateOferta(oferta);}
-			else
-			{throw new Exception("La oferta con el ID " + oferta.getIdOferta() + " no se encuentra en la base de datos");}
-		}
-		catch (SQLException sqlException) {
-			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-			sqlException.printStackTrace();
-			throw sqlException;
-		} 
-		catch (Exception exception) {
-			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-			exception.printStackTrace();
-			throw exception;
-		} 
-		finally {
-			try {
-				daoOferta.cerrarRecursos();
-				if(this.conn!=null){
-					this.conn.close();					
-				}
-			}
-			catch (SQLException exception) {
-				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			}
-		}	
-	}
-	/**
-	 * Metodo que modela la transaccion que elimina de la base de datos al oferta que entra por parametro. <br/>
-	 * Solamente se actualiza si existe el oferta en la Base de Datos <br/>
-	 * <b> post: </b> se ha eliminado el oferta que entra por parametro <br/>
-	 * @param Oferta - oferta a eliminar. oferta != null
-	 * @throws Exception - Cualquier error que se genere eliminando al oferta.
-	 */
-	public void deleteOferta(Oferta oferta) throws Exception 
-	{
-		DAOOferta daoOferta = new DAOOferta( );
-		try
-		{
-			this.conn = darConexion();
-			daoOferta.setConn( conn );
-			if(daoOferta.findOfertaById(oferta.getIdOferta()) != null)
-			{daoOferta.deleteOferta(oferta);}
-			else
-			{throw new Exception("La oferta con ID " + oferta.getIdOferta() + " no se encuentra en la base de datos");}
-		}
-		catch (SQLException sqlException) {
-			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-			sqlException.printStackTrace();
-			throw sqlException;
-		} 
-		catch (Exception exception) {
-			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-			exception.printStackTrace();
-			throw exception;
-		} 
-		finally {
-			try {
-				daoOferta.cerrarRecursos();
-				if(this.conn!=null){
-					this.conn.close();					
-				}
-			}
-			catch (SQLException exception) {
-				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			}
-		}	
-	}
-
-	public List<Pago> getPagosOperadores( ) throws Exception {
-		DAOOperador daoOperador = new DAOOperador();
-		List<Pago> pagos = null;
-		try
-		{
-			this.conn = darConexion();
-			daoOperador.setConn(conn);
-			pagos = daoOperador.darPagos();
-			if(pagos.isEmpty())
-			{
-				throw new Exception("Aun no se ha pagado a ningun operador entre el anio actual y el anio corrido.");				
-			}
-		} 
-		catch (SQLException sqlException) {
-			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-			sqlException.printStackTrace();
-			throw sqlException;
-		} 
-		catch (Exception exception) {
-			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-			exception.printStackTrace();
-			throw exception;
-		} 
-		finally {
-			try {
-				daoOperador.cerrarRecursos();
-				if(this.conn!=null){
-					this.conn.close();					
-				}
-			}
-			catch (SQLException exception) {
-				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			}
-		}
-		return pagos;
-	}
-
-	public List<Popular> get20OfertasMasPopulares( ) throws Exception {
-		DAOOferta daoOferta = new DAOOferta();
-		List<Popular> populares = null;
-		try
-		{
-			this.conn = darConexion();
-			daoOferta.setConn(conn);
-			populares = daoOferta.get20MasPopulares();
-			if(populares.isEmpty())
-			{
-				throw new Exception("No hay ofertas de las que se hayan reservado alojamientos.");				
-			}
-		} 
-		catch (SQLException sqlException) {
-			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
-			sqlException.printStackTrace();
-			throw sqlException;
-		} 
-		catch (Exception exception) {
-			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
-			exception.printStackTrace();
-			throw exception;
-		} 
-		finally {
-			try {
-				daoOferta.cerrarRecursos();
-				if(this.conn!=null){
-					this.conn.close();					
-				}
-			}
-			catch (SQLException exception) {
-				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
-				exception.printStackTrace();
-				throw exception;
-			}
-		}
-		return populares;
-	}
-
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// TRANSACCIONES DE LA TABLA RESERVASDEALOJAMIENTO
 	//----------------------------------------------------------------------------------------------------------------------------------	

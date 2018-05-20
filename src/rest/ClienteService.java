@@ -73,7 +73,7 @@ public class ClienteService {
 			return Response.status(500).entity(doErrorMessage(e)).build();
 		}
 	}
-	
+
 	@GET
 	@Path( "frecuentes" )
 	@Produces({ MediaType.APPLICATION_JSON })

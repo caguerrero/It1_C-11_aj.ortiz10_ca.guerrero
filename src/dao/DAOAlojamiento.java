@@ -279,6 +279,7 @@ public class DAOAlojamiento {
 		Alojamiento ofAlojamiento = new Alojamiento(capacidad, idAlojamiento, tamaño, ubicacion, habilitado, fecha_apertura);
 		return ofAlojamiento;
 	}
+	
 	private Ocupacion convertResultSetToOcupacion(ResultSet rs) throws SQLException{
 		Long idAlojamiento = rs.getLong("IDALOJAMIENTO");
 		double indice_de_ocupacion = rs.getDouble("INDICE_DE_OCUPACION");

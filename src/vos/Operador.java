@@ -15,17 +15,26 @@ public class Operador {
 
 	@JsonProperty(value="tipo")
 	private String tipo;
+	
+	@JsonProperty(value="horarioApertura")
+	private String horarioApertura;
+	
+	@JsonProperty(value="horarioCierre")
+	private String horarioCierre;
 	/**
 	 * @param cedula_NIT
 	 * @param direccion
 	 * @param nombre
 	 */
 	public Operador(@JsonProperty(value="cedula_NIT") Long cedula_NIT, @JsonProperty(value="direccion") String direccion, 
-			 @JsonProperty(value="nombre")String nombre, @JsonProperty(value="tipo")String tipo) {
+			 @JsonProperty(value="nombre")String nombre, @JsonProperty(value="tipo")String tipo, 
+			 @JsonProperty(value="horarioApertura") String horarioApertura, @JsonProperty(value="horarioCierre") String horarioCierre) {
 		this.cedula_NIT = cedula_NIT;
 		this.direccion = direccion;
 		this.nombre = nombre;
 		this.tipo = tipo;
+		this.horarioApertura = horarioApertura;
+		this.horarioCierre = horarioCierre;
 	}
 
 	/**
@@ -83,4 +92,21 @@ public class Operador {
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
+
+	public String getHorarioApertura() {
+		return horarioApertura;
+	}
+
+	public void setHorarioApertura(String horarioApertura) {
+		this.horarioApertura = horarioApertura;
+	}
+
+	public String getHorarioCierre() {
+		return horarioCierre;
+	}
+
+	public void setHorarioCierre(String horarioCierre) {
+		this.horarioCierre = horarioCierre;
+	}
+	
 }
