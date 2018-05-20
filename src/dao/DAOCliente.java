@@ -199,8 +199,6 @@ public class DAOCliente {
 			}
 		}
 
-		System.out.println(presql);
-
 		String sql = String.format(presql, USUARIO, idAlojamiento, fechaInicio, fechaFinal);
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
@@ -216,13 +214,25 @@ public class DAOCliente {
 	public ArrayList<Cliente> getClientesConsumoProveedor(Long idAlojamiento, String fechaInicio, String fechaFinal, List<String> filtros, Long idProveedor) throws SQLException, Exception {
 		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 
-		String sql = String.format("SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO " + 
+		String presql = "SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO " + 
 				"FROM ((%1$s.CLIENTE INNER JOIN %1$s.RESERVA ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) " + 
 				"INNER JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA) " + 
 				"INNER JOIN %1$s.ALOJAMIENTO ON RESERVASDEALOJAMIENTO.IDALOJAMIENTO=ALOJAMIENTO.IDALOJAMIENTO " + 
-				"WHERE (ALOJAMIENTO.IDALOJAMIENTO = %2$s) AND (FECHARESERVA BETWEEN TO_DATE('%3$s', 'DD/MM/YYYY') AND TO_DATE('%4$s', 'DD/MM/YYYY')) AND IDOPERADOR = %5$s" + 
-				"ORDER BY CEDULA, NOMBRE, ROLUNIANDINO", USUARIO, idAlojamiento, fechaInicio, fechaFinal, idProveedor);
+				"WHERE (ALOJAMIENTO.IDALOJAMIENTO = %2$s) AND (FECHARESERVA BETWEEN TO_DATE('%3$s', 'DD/MM/YYYY') AND TO_DATE('%4$s', 'DD/MM/YYYY')) AND IDOPERADOR = %5$s " + 
+				"ORDER BY ";
+		for(int i = 0; i < filtros.size(); i++)
+		{
+			if(i == 0) {
+				presql = presql + filtros.get(i);
+			}
+			else
+			{
+				presql += "," + filtros.get(i);
+			}
+		}
 
+		String sql = String.format(presql, USUARIO, idAlojamiento, fechaInicio, fechaFinal, idProveedor);
+		
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		ResultSet rs = prepStmt.executeQuery();
