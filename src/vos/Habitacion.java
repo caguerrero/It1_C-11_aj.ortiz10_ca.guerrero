@@ -16,8 +16,6 @@ public class Habitacion {
 	@JsonProperty(value="tipo")
 	private String tipo;
 	
-	@JsonProperty(value="numeroCupos")
-	private int numeroCupos;
 
 	/**
 	 * @param idHabitacion
@@ -25,13 +23,11 @@ public class Habitacion {
 	 * @param compartido
 	 * @param tipo
 	 */
-	public Habitacion(@JsonProperty(value="idHabitacion") Long idHabitacion, @JsonProperty(value="categoria") String categoria, @JsonProperty(value="compartido") String compartido,@JsonProperty(value="tipo") String tipo,
-			@JsonProperty(value="numeroCupos") int numeroCupos) {
+	public Habitacion(@JsonProperty(value="idHabitacion") Long idHabitacion, @JsonProperty(value="categoria") String categoria, @JsonProperty(value="compartido") String compartido,@JsonProperty(value="tipo") String tipo) {
 		this.idHabitacion = idHabitacion;
 		this.categoria = categoria;
 		this.compartido = compartido;
 		this.tipo = tipo;
-		this.numeroCupos = numeroCupos;
 	}
 
 	/**
@@ -88,13 +84,5 @@ public class Habitacion {
 	 */
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
-	}
-
-	public int getNumeroCupos() {
-		return numeroCupos;
-	}
-
-	public void setNumeroCupos(int numeroCupos) {
-		this.numeroCupos = numeroCupos;
 	}
 }
