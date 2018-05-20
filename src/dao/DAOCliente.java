@@ -5,7 +5,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.sql.Date;
 import java.util.List;
 
 import vos.*;
@@ -187,27 +190,76 @@ public class DAOCliente {
 				+ "INNER JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA " + 
 				"WHERE IDALOJAMIENTO = %2$s AND FECHARESERVA BETWEEN TO_DATE('%3$s', 'DD/MM/YYYY') AND TO_DATE('%4$s', 'DD/MM/YYYY') "
 				+ "ORDER BY ";
-
-		for(int i = 0; i < filtros.size(); i++)
+		presql = presql + filtros.get(0);
+		for(int i = 1; i < filtros.size(); i++)
 		{
-			if(i == 0) {
-				presql = presql + filtros.get(i);
-			}
-			else
-			{
-				presql += "," + filtros.get(i);
-			}
+			presql += "," + filtros.get(i);
 		}
 
 		String sql = String.format(presql, USUARIO, idAlojamiento, fechaInicio, fechaFinal);
 
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		System.out.println(prepStmt.toString());
+		
 		recursos.add(prepStmt);
 		ResultSet rs = prepStmt.executeQuery();
 
 		while (rs.next()) {
 			clientes.add(convertResultSetToCliente(rs));
 		}
+		return clientes;
+	}
+
+
+	public ArrayList<Cliente> getClientesConsumoAdminAnalyze(Long idAlojamiento, String fechaInicio, String fechaFinal, List<String> filtros) throws SQLException, Exception {
+		ArrayList<Join> joins = new ArrayList<Join>();
+		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
+
+		String presql = "SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO FROM (%1$s.CLIENTE INNER JOIN %1$s.RESERVA ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) "
+				+ "INNER JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA ORDER BY ";
+
+		presql = presql + filtros.get(0);
+		for(int i = 1; i < filtros.size(); i++)
+		{
+			presql += "," + filtros.get(i);
+		}
+
+		String sql = String.format(presql, USUARIO);
+
+		
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		String a = prepStmt.toString();
+		System.out.println(a);
+		
+		while (rs.next()) {
+			joins.add(convertResultSetToJoin(rs));
+		}
+		SimpleDateFormat format = new SimpleDateFormat("DD/MM/YYYY");
+	    java.util.Date parsed = null;
+	    java.util.Date parsed2 = null;
+		try {
+			parsed = format.parse(fechaInicio);
+			parsed2 = format.parse(fechaFinal);
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    Date dateSqlInicial = new Date(parsed.getTime());
+	    Date dateSqlFinal = new Date(parsed2.getTime());
+	    int j = 0;
+		while(j < joins.size())
+		{
+			Join actualJoin = joins.get(j);
+			if(actualJoin.getIdAlojamiento() == idAlojamiento &&  dateSqlInicial.getTime() <= actualJoin.getFechaReserva().getTime() && actualJoin.getFechaReserva().getTime() <= dateSqlFinal.getTime() ) {
+				Cliente cliente = new Cliente(actualJoin.getCedula(), actualJoin.getNombre(), actualJoin.getRolUniandino());
+				clientes.add(cliente);
+			}
+			j++;
+		}
+		
 		return clientes;
 	}
 
@@ -232,7 +284,7 @@ public class DAOCliente {
 		}
 
 		String sql = String.format(presql, USUARIO, idAlojamiento, fechaInicio, fechaFinal, idProveedor);
-		
+
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		ResultSet rs = prepStmt.executeQuery();
@@ -264,7 +316,7 @@ public class DAOCliente {
 		}
 		presql = presql + ")";
 		String sql = String.format(presql, USUARIO, idAlojamiento, fechaInicio, fechaFinal);
-		
+
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		ResultSet rs = prepStmt.executeQuery();
@@ -318,5 +370,17 @@ public class DAOCliente {
 		Cliente cliente = new Cliente(cedula, nombre, roluniandino);
 
 		return cliente;
+	}
+	
+	public Join convertResultSetToJoin(ResultSet resultSet) throws SQLException {
+
+		Long cedula = resultSet.getLong("CEDULA");
+		String nombre = resultSet.getString("NOMBRE");
+		String roluniandino = resultSet.getString("ROLUNIANDINO");
+		Long idAlojamiento = resultSet.getLong("IDALOJAMIENTO");
+		Date fechaReserva = resultSet.getDate("FECHARESERVA");
+		Join join = new Join(cedula, nombre, roluniandino, idAlojamiento, fechaReserva);
+
+		return join;
 	}
 }

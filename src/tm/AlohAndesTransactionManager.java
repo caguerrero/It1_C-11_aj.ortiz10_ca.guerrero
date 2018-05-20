@@ -488,6 +488,53 @@ public class AlohAndesTransactionManager {
 		return clientes;
 	}
 
+	public List<Cliente> getClientesConsumoAdminAnalyze(Long idAlojamiento,String fechaInicio, String fechaFinal, List<String> filtros) throws Exception {
+		DAOCliente daoCliente = new DAOCliente();
+		List<Cliente> clientes;
+		try 
+		{
+			this.conn = darConexion();
+			daoCliente.setConn(conn);
+			int i = 0;
+			while(i < filtros.size())
+			{
+				if(!filtros.get(i).equals("CEDULA") && !filtros.get(i).equals("NOMBRE") && !filtros.get(i).equals("ROLUNIANDINO"))
+				{
+					throw new Exception( filtros.get(i) + " no es un filtro valido." + " Los filtros que se pueden aplicar son unicamente: CEDULA, NOMBRE O ROLUNIANDINO. Separados por espacios.");
+				}
+				i++;
+			}
+			clientes = daoCliente.getClientesConsumoAdminAnalyze(idAlojamiento, fechaInicio, fechaFinal, filtros);
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			conn.rollback();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			conn.rollback();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoCliente.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				conn.rollback();
+				throw exception;
+			}
+		}
+		return clientes;
+	}
+	
 	public List<Cliente> getClientesConsumoProveedor(Long idAlojamiento,String fechaInicio, String fechaFinal, List<String> filtros, Long idProveedor) throws Exception {
 		DAOCliente daoCliente = new DAOCliente();
 		List<Cliente> clientes;

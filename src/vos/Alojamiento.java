@@ -23,9 +23,6 @@ public class Alojamiento {
 	@JsonProperty(value="fecha_apertura")
 	private Date fecha_apertura;
 	
-	@JsonProperty(value="numeroCupos")
-	private int numeroCupos;
-	
 	/**
 	 * @param capacidad
 	 * @param idOfertaAlojamiento
@@ -36,14 +33,13 @@ public class Alojamiento {
 	 */
 	public Alojamiento(@JsonProperty(value="capacidad")int capacidad, @JsonProperty(value="idAlojamiento")Long idAlojamiento, 
 			@JsonProperty(value="tamaño")double tamaño, @JsonProperty(value="ubicacion")String ubicacion, @JsonProperty(value="habilitado")int habilitado, 
-			@JsonProperty(value="fecha_apertura")Date fecha_apertura, @JsonProperty(value="numeroCupos") int numeroCupos) {
+			@JsonProperty(value="fecha_apertura")Date fecha_apertura) {
 		this.capacidad = capacidad;
 		this.idAlojamiento = idAlojamiento;
 		this.tamaño = tamaño;
 		this.ubicacion = ubicacion;
 		this.habilitado = habilitado;
 		this.fecha_apertura = fecha_apertura;
-		this.numeroCupos = numeroCupos;
 	}
 
 	/**
@@ -117,13 +113,4 @@ public class Alojamiento {
 	public void setFecha_apertura(Date fecha_apertura) {
 		this.fecha_apertura = fecha_apertura;
 	}
-
-	public int getNumeroCupos() {
-		return numeroCupos;
-	}
-
-	public void setNumeroCupos(int numeroCupos) {
-		this.numeroCupos = numeroCupos;
-	}
-	
 }

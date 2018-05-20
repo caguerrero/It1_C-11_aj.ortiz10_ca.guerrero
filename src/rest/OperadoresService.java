@@ -241,4 +241,26 @@ public class OperadoresService {
 			return Response.status(500).entity(doErrorMessage(e)).build();
 		}
 	}
+	@GET
+	@Path( "consumoAdminJava" )
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getClientesConsumoAdminJava(@QueryParam("idAlojamiento") Long idAlojamiento,@QueryParam("fechaInicio") String fechaInicio, @QueryParam("fechaFinal") String fechaFinal,
+			@QueryParam("filtros") String filtros) {
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager(getPath());
+			String[] filtros1 = filtros.split(" ");
+			List<String> filtros2 = new ArrayList<String>();
+			int i = 0;
+			while(i < filtros1.length) {
+				filtros2.add(filtros1[i]);
+				i++;
+			}
+			List<Cliente> clientes;
+			clientes = tm.getClientesConsumoAdminAnalyze(idAlojamiento, fechaInicio, fechaFinal, filtros2);
+			return Response.status(200).entity(clientes).build();
+		}
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
+		}
+	}
 }
