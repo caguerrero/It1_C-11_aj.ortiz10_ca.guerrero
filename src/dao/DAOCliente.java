@@ -243,19 +243,28 @@ public class DAOCliente {
 		return clientes;
 	}
 
-	public ArrayList<Cliente> getClientesConsumoNoReserva(Long idAlojamiento, String fechaInicio, String fechaFinal) throws SQLException, Exception {
+	public ArrayList<Cliente> getClientesConsumoNoReserva(Long idAlojamiento, String fechaInicio, String fechaFinal, List<String> filtros) throws SQLException, Exception {
 		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 
-		String sql = String.format("SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO " + 
-				"FROM (SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO " + 
+		String presql = "SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO FROM (SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO " + 
 				"FROM (%1$s.CLIENTE FULL OUTER JOIN %1$s.RESERVA ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) " + 
 				"FULL OUTER JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA " + 
 				"MINUS SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO FROM (%1$s.CLIENTE JOIN %1$s.RESERVA " + 
-				"ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) " + 
-				"JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA " + 
-				"WHERE IDALOJAMIENTO = %2$s AND FECHARESERVA BETWEEN '%3$s' AND '%4$s' ORDER BY CEDULA, NOMBRE, ROLUNIANDINO", 
-				USUARIO, idAlojamiento, fechaInicio, fechaFinal);
-
+				"ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA " + 
+				"WHERE IDALOJAMIENTO = %2$s AND FECHARESERVA BETWEEN TO_DATE('%3$s', 'DD/MM/YYYY') AND TO_DATE('%4$s', 'DD/MM/YYYY') ORDER BY ";
+		for(int i = 0; i < filtros.size(); i++)
+		{
+			if(i == 0) {
+				presql = presql + filtros.get(i);
+			}
+			else
+			{
+				presql += "," + filtros.get(i);
+			}
+		}
+		presql = presql + ")";
+		String sql = String.format(presql, USUARIO, idAlojamiento, fechaInicio, fechaFinal);
+		
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		ResultSet rs = prepStmt.executeQuery();

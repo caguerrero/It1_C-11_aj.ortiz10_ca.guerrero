@@ -535,14 +535,23 @@ public class AlohAndesTransactionManager {
 		return clientes;
 	}
 
-	public List<Cliente> getClientesConsumoNoReserva(Long idAlojamiento,String fechaInicio, String fechaFinal) throws Exception {
+	public List<Cliente> getClientesConsumoNoReserva(Long idAlojamiento,String fechaInicio, String fechaFinal, List<String> filtros) throws Exception {
 		DAOCliente daoCliente = new DAOCliente();
 		List<Cliente> clientes;
 		try 
 		{
 			this.conn = darConexion();
 			daoCliente.setConn(conn);
-			clientes = daoCliente.getClientesConsumoNoReserva(idAlojamiento, fechaInicio, fechaFinal);
+			int i = 0;
+			while(i < filtros.size())
+			{
+				if(!filtros.get(i).equals("CEDULA") && !filtros.get(i).equals("NOMBRE") && !filtros.get(i).equals("ROLUNIANDINO"))
+				{
+					throw new Exception( filtros.get(i) + " no es un filtro valido." + " Los filtros que se pueden aplicar son unicamente: CEDULA, NOMBRE O ROLUNIANDINO. Separados por espacios.");
+				}
+				i++;
+			}
+			clientes = daoCliente.getClientesConsumoNoReserva(idAlojamiento, fechaInicio, fechaFinal, filtros);
 		}
 		catch (SQLException sqlException) {
 			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
