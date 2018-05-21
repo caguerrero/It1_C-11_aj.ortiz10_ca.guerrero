@@ -1,0 +1,255 @@
+{
+	"info": {
+		"_postman_id": "f213a625-4160-45a8-98b8-ef1226f2906f",
+		"name": "PruebasIteracion3",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Prueba Exitosa: RFC10 - Se obtienen los clientes que puede ver el Administrador",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/It1_C-11_aj.ortiz10_ca.guerrero/rest/operadores/consumoAdmin?idAlojamiento=5&fechaInicio=05/01/2017&fechaFinal=06/01/2018&filtros=NOMBRE ROLUNIANDINO",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"It1_C-11_aj.ortiz10_ca.guerrero",
+						"rest",
+						"operadores",
+						"consumoAdmin"
+					],
+					"query": [
+						{
+							"key": "idAlojamiento",
+							"value": "5"
+						},
+						{
+							"key": "fechaInicio",
+							"value": "05/01/2017"
+						},
+						{
+							"key": "fechaFinal",
+							"value": "06/01/2018"
+						},
+						{
+							"key": "filtros",
+							"value": "NOMBRE ROLUNIANDINO"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Prueba Exitosa: RFC10 - Se obtiene el consumo de Alohandes para el operador dado.",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/It1_C-11_aj.ortiz10_ca.guerrero/rest/operadores/consumo?idAlojamiento=16641&fechaInicio=05/01/2016&fechaFinal=06/01/2019&filtros=NOMBRE ROLUNIANDINO&idOperador=2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"It1_C-11_aj.ortiz10_ca.guerrero",
+						"rest",
+						"operadores",
+						"consumo"
+					],
+					"query": [
+						{
+							"key": "idAlojamiento",
+							"value": "16641"
+						},
+						{
+							"key": "fechaInicio",
+							"value": "05/01/2016"
+						},
+						{
+							"key": "fechaFinal",
+							"value": "06/01/2019"
+						},
+						{
+							"key": "filtros",
+							"value": "NOMBRE ROLUNIANDINO"
+						},
+						{
+							"key": "idOperador",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PruebaInstruccionesControlJava",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/It1_C-11_aj.ortiz10_ca.guerrero/rest/operadores/consumoAdminJava?idAlojamiento=5&fechaInicio=05/01/2017&fechaFinal=06/01/2018&filtros=NOMBRE ROLUNIANDINO",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"It1_C-11_aj.ortiz10_ca.guerrero",
+						"rest",
+						"operadores",
+						"consumoAdminJava"
+					],
+					"query": [
+						{
+							"key": "idAlojamiento",
+							"value": "5"
+						},
+						{
+							"key": "fechaInicio",
+							"value": "05/01/2017"
+						},
+						{
+							"key": "fechaFinal",
+							"value": "06/01/2018"
+						},
+						{
+							"key": "filtros",
+							"value": "NOMBRE ROLUNIANDINO"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Prueba RFC11",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/It1_C-11_aj.ortiz10_ca.guerrero/rest/operadores/consumoNoReserva?idAlojamiento=5&fechaInicio=05/01/2017&fechaFinal=06/01/2018&filtros=CEDULA NOMBRE",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"It1_C-11_aj.ortiz10_ca.guerrero",
+						"rest",
+						"operadores",
+						"consumoNoReserva"
+					],
+					"query": [
+						{
+							"key": "idAlojamiento",
+							"value": "5"
+						},
+						{
+							"key": "fechaInicio",
+							"value": "05/01/2017"
+						},
+						{
+							"key": "fechaFinal",
+							"value": "06/01/2018"
+						},
+						{
+							"key": "filtros",
+							"value": "CEDULA NOMBRE"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Prueba RFC11 Operador",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/It1_C-11_aj.ortiz10_ca.guerrero/rest/operadores/consumoNoReserva?idAlojamiento=16641&fechaInicio=05/01/2016&fechaFinal=06/01/2019&filtros=CEDULA&idOperador=2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"It1_C-11_aj.ortiz10_ca.guerrero",
+						"rest",
+						"operadores",
+						"consumoNoReserva"
+					],
+					"query": [
+						{
+							"key": "idAlojamiento",
+							"value": "16641"
+						},
+						{
+							"key": "fechaInicio",
+							"value": "05/01/2016"
+						},
+						{
+							"key": "fechaFinal",
+							"value": "06/01/2019"
+						},
+						{
+							"key": "filtros",
+							"value": "CEDULA"
+						},
+						{
+							"key": "idOperador",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RFC12 - Prueba Exitosa",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "http://localhost:8080/It1_C-11_aj.ortiz10_ca.guerrero/rest/alojamientos/funcionamiento?fechaInicio=01/12/2019&fechaFinal=31/12/2019",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"It1_C-11_aj.ortiz10_ca.guerrero",
+						"rest",
+						"alojamientos",
+						"funcionamiento"
+					],
+					"query": [
+						{
+							"key": "fechaInicio",
+							"value": "01/12/2019"
+						},
+						{
+							"key": "fechaFinal",
+							"value": "31/12/2019"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
