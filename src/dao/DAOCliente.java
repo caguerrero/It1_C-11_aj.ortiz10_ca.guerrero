@@ -215,7 +215,7 @@ public class DAOCliente {
 		ArrayList<Join> joins = new ArrayList<Join>();
 		ArrayList<Cliente> clientes = new ArrayList<Cliente>();
 
-		String presql = "SELECT DISTINCT(CEDULA), NOMBRE, ROLUNIANDINO FROM (%1$s.CLIENTE INNER JOIN %1$s.RESERVA ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) "
+		String presql = "SELECT CEDULA, NOMBRE, ROLUNIANDINO, IDALOJAMIENTO, FECHARESERVA FROM (%1$s.CLIENTE INNER JOIN %1$s.RESERVA ON CLIENTE.CEDULA=RESERVA.IDCLIENTE) "
 				+ "INNER JOIN %1$s.RESERVASDEALOJAMIENTO ON RESERVA.IDRESERVA=RESERVASDEALOJAMIENTO.IDRESERVA ORDER BY ";
 
 		presql = presql + filtros.get(0);
@@ -223,20 +223,19 @@ public class DAOCliente {
 		{
 			presql += "," + filtros.get(i);
 		}
-
+		
+		System.out.println(presql);
 		String sql = String.format(presql, USUARIO);
 
 		
 		PreparedStatement prepStmt = conn.prepareStatement(sql);
 		recursos.add(prepStmt);
 		ResultSet rs = prepStmt.executeQuery();
-
-		String a = prepStmt.toString();
-		System.out.println(a);
 		
 		while (rs.next()) {
 			joins.add(convertResultSetToJoin(rs));
 		}
+		System.out.println(joins.size());
 		SimpleDateFormat format = new SimpleDateFormat("DD/MM/YYYY");
 	    java.util.Date parsed = null;
 	    java.util.Date parsed2 = null;
@@ -244,7 +243,6 @@ public class DAOCliente {
 			parsed = format.parse(fechaInicio);
 			parsed2 = format.parse(fechaFinal);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	    Date dateSqlInicial = new Date(parsed.getTime());
@@ -254,8 +252,17 @@ public class DAOCliente {
 		{
 			Join actualJoin = joins.get(j);
 			if(actualJoin.getIdAlojamiento() == idAlojamiento &&  dateSqlInicial.getTime() <= actualJoin.getFechaReserva().getTime() && actualJoin.getFechaReserva().getTime() <= dateSqlFinal.getTime() ) {
-				Cliente cliente = new Cliente(actualJoin.getCedula(), actualJoin.getNombre(), actualJoin.getRolUniandino());
-				clientes.add(cliente);
+				for (int i = 0; i < clientes.size(); i++)
+				{
+					if(actualJoin.getCedula() == clientes.get(i).getCedula())
+					{
+						break;
+					}
+					else {
+						Cliente cliente = new Cliente(actualJoin.getCedula(), actualJoin.getNombre(), actualJoin.getRolUniandino());
+						clientes.add(cliente);
+					}
+				}
 			}
 			j++;
 		}

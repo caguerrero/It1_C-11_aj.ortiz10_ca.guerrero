@@ -234,10 +234,145 @@ public class DAOAlojamiento {
 		}
 		return Alojamientos;
 	}
+	
+	public ArrayList<Categorizacion> getFuncionamientoAlojamientos(String fechaInicio, String fechaFinal) throws SQLException, Exception {
+		ArrayList<Categorizacion> funcionamientos = new ArrayList<Categorizacion>();
+
+		String sql = String.format("SELECT * FROM " +
+				"(SELECT A.SEMANA, 'Mayor Ocupacion' AS CATEGORIA, A.IDALOJAMIENTO, MAXIMO FROM " + 
+				" " + 
+				"(SELECT TO_NUMBER(TO_CHAR(FECHA,'WW')) AS SEMANA, IDALOJAMIENTO,  AVG(OCUPACION) AS OCUPACION " + 
+				"FROM " + 
+				"(SELECT IDALOJAMIENTO, FECHA, COUNT(IDRESERVA)/CAPACIDAD as OCUPACION " + 
+				"FROM ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO NATURAL JOIN RESERVA CROSS JOIN " + 
+				"(SELECT FECHA " + 
+				"FROM LISTA_DE_FECHAS " + 
+				"WHERE FECHA BETWEEN TO_DATE('%2$s','DD/MM/YYYY') AND TO_DATE('%3$s','DD/MM/YYYY')) " + 
+				"WHERE FECHA BETWEEN INICIOESTADIA AND FINESTADIA " + 
+				"GROUP BY IDALOJAMIENTO, FECHA, CAPACIDAD) " + 
+				"GROUP BY IDALOJAMIENTO, TO_NUMBER(TO_CHAR(FECHA,'WW'))) A " + 
+				" " + 
+				"INNER JOIN " + 
+				" " + 
+				"(SELECT SEMANA, MAX(OCUPACION) AS MAXIMO " + 
+				"FROM " + 
+				"(SELECT TO_NUMBER(TO_CHAR(FECHA,'WW')) AS SEMANA, IDALOJAMIENTO,  AVG(OCUPACION) AS OCUPACION " + 
+				"FROM " + 
+				"(SELECT IDALOJAMIENTO, FECHA, COUNT(IDRESERVA)/CAPACIDAD as OCUPACION " + 
+				"FROM ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO NATURAL JOIN RESERVA CROSS JOIN " + 
+				"(SELECT FECHA " + 
+				"FROM LISTA_DE_FECHAS " + 
+				"WHERE FECHA BETWEEN TO_DATE('%2$s','DD/MM/YYYY') AND TO_DATE('%3$s','DD/MM/YYYY')) " + 
+				"WHERE FECHA BETWEEN INICIOESTADIA AND FINESTADIA " + 
+				"GROUP BY IDALOJAMIENTO, FECHA, CAPACIDAD) " + 
+				"GROUP BY IDALOJAMIENTO, TO_NUMBER(TO_CHAR(FECHA,'WW'))) " + 
+				"GROUP BY SEMANA) B  " + 
+				" " + 
+				"ON (A.OCUPACION=B.MAXIMO AND A.SEMANA=B.SEMANA)) " + 
+				" " + 
+				"UNION " + 
+				" " + 
+				"(SELECT A.SEMANA, 'Menor Ocupacion' AS CATEGORIA, A.IDALOJAMIENTO, MAXIMO FROM " + 
+				" " + 
+				"(SELECT TO_NUMBER(TO_CHAR(FECHA,'WW')) AS SEMANA, IDALOJAMIENTO,  AVG(OCUPACION) AS OCUPACION " + 
+				"FROM " + 
+				"(SELECT IDALOJAMIENTO, FECHA, COUNT(IDRESERVA)/CAPACIDAD as OCUPACION " + 
+				"FROM ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO NATURAL JOIN RESERVA CROSS JOIN " + 
+				"(SELECT FECHA " + 
+				"FROM LISTA_DE_FECHAS " + 
+				"WHERE FECHA BETWEEN TO_DATE('%2$s','DD/MM/YYYY') AND TO_DATE('%3$s','DD/MM/YYYY')) " + 
+				"WHERE FECHA BETWEEN INICIOESTADIA AND FINESTADIA " + 
+				"GROUP BY IDALOJAMIENTO, FECHA, CAPACIDAD) " + 
+				"GROUP BY IDALOJAMIENTO, TO_NUMBER(TO_CHAR(FECHA,'WW'))) A " + 
+				" " + 
+				"INNER JOIN " + 
+				" " + 
+				"(SELECT SEMANA, MIN(OCUPACION) AS MAXIMO " + 
+				"FROM " + 
+				"(SELECT TO_NUMBER(TO_CHAR(FECHA,'WW')) AS SEMANA, IDALOJAMIENTO,  AVG(OCUPACION) AS OCUPACION " + 
+				"FROM " + 
+				"(SELECT IDALOJAMIENTO, FECHA, COUNT(IDRESERVA)/CAPACIDAD as OCUPACION " + 
+				"FROM ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO NATURAL JOIN RESERVA CROSS JOIN " + 
+				"(SELECT FECHA " + 
+				"FROM LISTA_DE_FECHAS " + 
+				"WHERE FECHA BETWEEN TO_DATE('%2$s','DD/MM/YYYY') AND TO_DATE('%3$s','DD/MM/YYYY')) " + 
+				"WHERE FECHA BETWEEN INICIOESTADIA AND FINESTADIA " + 
+				"GROUP BY IDALOJAMIENTO, FECHA, CAPACIDAD) " + 
+				"GROUP BY IDALOJAMIENTO, TO_NUMBER(TO_CHAR(FECHA,'WW'))) " + 
+				"GROUP BY SEMANA) B  " + 
+				" " + 
+				"ON (A.OCUPACION=B.MAXIMO AND A.SEMANA=B.SEMANA))  " + 
+				"  " + 
+				"UNION " + 
+				" " + 
+				"(SELECT A.SEMANA, 'Mayor Solicitudes' AS CATEGORIA, A.IDOPERADOR, SOLICITUDES FROM " + 
+				" " + 
+				"(SELECT IDOPERADOR, TO_NUMBER(TO_CHAR(FECHA,'WW')) AS Semana, COUNT(IDRESERVA) as SOLICITUDES " + 
+				"FROM ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO NATURAL JOIN RESERVA CROSS JOIN " + 
+				"(SELECT * " + 
+				"FROM LISTA_DE_FECHAS " + 
+				"WHERE FECHA BETWEEN TO_DATE('%2$s','DD/MM/YYYY') AND TO_DATE('%3$s','DD/MM/YYYY')) " + 
+				"WHERE FECHA BETWEEN INICIOESTADIA AND FINESTADIA " + 
+				"GROUP BY IDOPERADOR, TO_NUMBER(TO_CHAR(FECHA,'WW'))) A " + 
+				" " + 
+				"INNER JOIN " + 
+				" " + 
+				"(SELECT SEMANA, MAX(SOLICITUDES) AS MAXIMO " + 
+				"FROM " + 
+				"(SELECT IDOPERADOR, TO_NUMBER(TO_CHAR(FECHA,'WW')) AS Semana, COUNT(IDRESERVA) as SOLICITUDES " + 
+				"FROM ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO NATURAL JOIN RESERVA CROSS JOIN " + 
+				"(SELECT * " + 
+				"FROM LISTA_DE_FECHAS " + 
+				"WHERE FECHA BETWEEN TO_DATE('%2$s','DD/MM/YYYY') AND TO_DATE('%3$s','DD/MM/YYYY')) " + 
+				"WHERE FECHA BETWEEN INICIOESTADIA AND FINESTADIA " + 
+				"GROUP BY IDOPERADOR, TO_NUMBER(TO_CHAR(FECHA,'WW'))) " + 
+				"GROUP BY SEMANA) B " + 
+				" " + 
+				"ON A.SOLICITUDES=B.MAXIMO AND A.SEMANA=B.SEMANA) " + 
+				" " + 
+				"UNION " + 
+				" " + 
+				"(SELECT A.SEMANA, 'Menor Solicitudes' AS CATEGORIA, A.IDOPERADOR, SOLICITUDES FROM " + 
+				" " + 
+				"(SELECT IDOPERADOR, TO_NUMBER(TO_CHAR(FECHA,'WW')) AS Semana, COUNT(IDRESERVA) as SOLICITUDES " + 
+				"FROM ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO NATURAL JOIN RESERVA CROSS JOIN " + 
+				"(SELECT * " + 
+				"FROM LISTA_DE_FECHAS " + 
+				"WHERE FECHA BETWEEN TO_DATE('%2$s','DD/MM/YYYY') AND TO_DATE('%3$s','DD/MM/YYYY')) " + 
+				"WHERE FECHA BETWEEN INICIOESTADIA AND FINESTADIA " + 
+				"GROUP BY IDOPERADOR, TO_NUMBER(TO_CHAR(FECHA,'WW'))) A " + 
+				" " + 
+				"INNER JOIN " + 
+				" " + 
+				"(SELECT SEMANA, MIN(SOLICITUDES) AS MAXIMO " + 
+				"FROM " + 
+				"(SELECT IDOPERADOR, TO_NUMBER(TO_CHAR(FECHA,'WW')) AS Semana, COUNT(IDRESERVA) as SOLICITUDES " + 
+				"FROM ALOJAMIENTO NATURAL JOIN RESERVASDEALOJAMIENTO NATURAL JOIN RESERVA CROSS JOIN " + 
+				"(SELECT * " + 
+				"FROM LISTA_DE_FECHAS " + 
+				"WHERE FECHA BETWEEN TO_DATE('%2$s','DD/MM/YYYY') AND TO_DATE('%3$s','DD/MM/YYYY')) " + 
+				"WHERE FECHA BETWEEN INICIOESTADIA AND FINESTADIA " + 
+				"GROUP BY IDOPERADOR, TO_NUMBER(TO_CHAR(FECHA,'WW'))) " + 
+				"GROUP BY SEMANA) B " + 
+				" " + 
+				"ON A.SOLICITUDES=B.MAXIMO AND A.SEMANA=B.SEMANA) " + 
+				" ", USUARIO, fechaInicio, fechaFinal);
+
+		PreparedStatement prepStmt = conn.prepareStatement(sql);
+		recursos.add(prepStmt);
+		ResultSet rs = prepStmt.executeQuery();
+
+		while (rs.next()) {
+			funcionamientos.add(convertResultSetToCategorizacion(rs));
+		}
+		return funcionamientos;
+	}
 
 	//----------------------------------------------------------------------------------------------------------------------------------
 	// METODOS AUXILIARES
 	//----------------------------------------------------------------------------------------------------------------------------------
+
+	
 
 	/**
 	 * Metodo encargado de inicializar la conexion del DAO a la Base de Datos a partir del parametro <br/>
@@ -285,5 +420,14 @@ public class DAOAlojamiento {
 		double indice_de_ocupacion = rs.getDouble("INDICE_DE_OCUPACION");
 		Ocupacion alojamiento = new Ocupacion(idAlojamiento, indice_de_ocupacion);
 		return alojamiento;
+	}
+	
+	private Categorizacion convertResultSetToCategorizacion(ResultSet rs) throws SQLException {
+		int semana = rs.getInt("SEMANA");
+		String categoria = rs.getString("CATEGORIA");
+		Long idAlojamiento = rs.getLong("IDALOJAMIENTO");
+		int maximo = rs.getInt("MAXIMO");
+		Categorizacion categorizacion = new Categorizacion(semana, categoria, idAlojamiento, maximo);
+		return categorizacion;
 	}
 }

@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response;
 
 import tm.AlohAndesTransactionManager;
 import vos.Alojamiento;
+import vos.Categorizacion;
 import vos.Ocupacion;
 
 @Path("alojamientos")
@@ -216,4 +217,19 @@ public class AlojamientoService {
 		}
 	}
 	
+	@GET
+	@Path( "funcionamiento" )
+	@Produces( { MediaType.APPLICATION_JSON } )
+	public Response getOFuncionamientoAlojamientos(@QueryParam( "fechaInicio" ) String fechaInicio, @QueryParam( "fechaFinal" ) String fechaFinal) {
+		
+		try {
+			AlohAndesTransactionManager tm = new AlohAndesTransactionManager( getPath() );
+			List<Categorizacion> funciones;
+			funciones = tm.getFuncionamientoAlojamientos(fechaInicio, fechaFinal);
+			return Response.status(200).entity(funciones).build();
+		} 
+		catch (Exception e) {
+			return Response.status(500).entity(doErrorMessage(e)).build();
+		}
+	}
 }

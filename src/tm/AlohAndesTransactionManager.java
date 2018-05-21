@@ -22,6 +22,7 @@ import dao.DAOServicio;
 import dao.DAOServicioDeAlojamiento;
 import dao.DAOUsos;
 import vos.Apartamento;
+import vos.Categorizacion;
 import vos.Cliente;
 import vos.Habitacion;
 import vos.Ocupacion;
@@ -1271,6 +1272,45 @@ public class AlohAndesTransactionManager {
 		return alojamientos;
 	}
 
+	public List<Categorizacion> getFuncionamientoAlojamientos(String fechaInicio, String fechaFinal) throws Exception {
+		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
+		List<Categorizacion> ocupacionAlojamientos;
+		try
+		{
+			this.conn = darConexion();
+			daoAlojamiento.setConn(conn);
+			ocupacionAlojamientos = daoAlojamiento.getFuncionamientoAlojamientos(fechaInicio,fechaFinal);
+			conn.commit();
+		}
+		catch (SQLException sqlException) {
+			System.err.println("[EXCEPTION] SQLException:" + sqlException.getMessage());
+			sqlException.printStackTrace();
+			conn.rollback();
+			throw sqlException;
+		} 
+		catch (Exception exception) {
+			System.err.println("[EXCEPTION] General Exception:" + exception.getMessage());
+			exception.printStackTrace();
+			conn.rollback();
+			throw exception;
+		} 
+		finally {
+			try {
+				daoAlojamiento.cerrarRecursos();
+				if(this.conn!=null){
+					this.conn.close();					
+				}
+			}
+			catch (SQLException exception) {
+				System.err.println("[EXCEPTION] SQLException While Closing Resources:" + exception.getMessage());
+				exception.printStackTrace();
+				conn.rollback();
+				throw exception;
+			}
+		}
+		return ocupacionAlojamientos;
+	}
+	
 	public List<Ocupacion> getOcupacionAlojamientos() throws Exception {
 		DAOAlojamiento daoAlojamiento = new DAOAlojamiento();
 		List<Ocupacion> ocupacionAlojamientos;
